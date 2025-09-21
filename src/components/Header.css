@@ -1,51 +1,92 @@
 .header {
   height: var(--header-height);
-  background: var(--dark-gray);
-  border-bottom: 1px solid var(--border-color);
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--glass-border);
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 0 2rem;
   position: sticky;
   top: 0;
   z-index: 100;
 }
 
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-}
-
-.header-title h2 {
-  color: var(--text-primary);
-  font-weight: 600;
-  font-size: 1.5rem;
-}
-
-.header-actions {
+.header-left {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 1rem;
 }
 
-.admin-info {
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-.logout-btn {
-  background: var(--accent-gold);
-  color: var(--secondary-black);
+.menu-toggle {
+  display: none;
+  background: none;
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
-  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 1.5rem;
   cursor: pointer;
+  padding: 0.5rem;
+  border-radius: var(--border-radius-sm);
   transition: all 0.3s ease;
 }
 
-.logout-btn:hover {
-  background: #e6c200;
-  transform: translateY(-1px);
+.menu-toggle:hover {
+  background: var(--glass-bg);
+  color: var(--accent-primary);
+}
+
+.header-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.logout-button {
+  background: linear-gradient(135deg, var(--warning), #f97316);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-md);
+}
+
+.logout-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+  }
+  
+  .header {
+    padding: 0 1rem;
+  }
+  
+  .header-title {
+    font-size: 1.5rem;
+  }
+  
+  .user-info {
+    display: none;
+  }
 }
