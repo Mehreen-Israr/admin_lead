@@ -1,8 +1,7 @@
 .header {
   height: var(--header-height);
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--glass-border);
+  background: var(--secondary-bg);
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -31,13 +30,13 @@
 }
 
 .menu-toggle:hover {
-  background: var(--glass-bg);
-  color: var(--accent-primary);
+  background: rgba(255, 215, 0, 0.1);
+  color: var(--accent-gold);
 }
 
 .header-title {
   font-size: 1.75rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-primary);
   margin: 0;
 }
@@ -57,8 +56,8 @@
 }
 
 .logout-button {
-  background: linear-gradient(135deg, var(--warning), #f97316);
-  color: white;
+  background: var(--accent-gold);
+  color: var(--primary-bg);
   border: none;
   padding: 0.75rem 1.5rem;
   border-radius: var(--border-radius-sm);
@@ -69,6 +68,7 @@
 }
 
 .logout-button:hover {
+  background: var(--accent-gold-hover);
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
 }
