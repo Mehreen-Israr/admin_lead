@@ -1,6 +1,4 @@
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? '' // Use relative paths for Vercel serverless functions
-  : 'http://localhost:5001'; // Local development server
+const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5001';
 
 // Helper function to get auth headers
 const getAuthHeaders = () => {
