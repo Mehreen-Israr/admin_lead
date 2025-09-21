@@ -1,25 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  --bg-primary: #f9fafb;
-  --bg-secondary: #ffffff;
-  --bg-card: #ffffff;
-  --text-primary: #111827;
-  --text-secondary: #6b7280;
-  --text-muted: #9ca3af;
-  --border: #e5e7eb;
-  --border-light: #f3f4f6;
-  --accent: #2563eb;
-  --accent-hover: #1d4ed8;
-  --success: #16a34a;
-  --warning: #f59e0b;
-  --danger: #dc2626;
-  --sidebar-width: 250px;
-  --header-height: 64px;
-
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-  --shadow-md: 0 2px 6px rgba(0,0,0,0.1);
-  --shadow-lg: 0 4px 14px rgba(0,0,0,0.15);
+  --bg-primary: #0f0f0f;
+  --bg-secondary: #1a1a1a;
+  --bg-card: #1e1e1e;
+  --text-primary: #ffffff;
+  --text-secondary: #b3b3b3;
+  --text-muted: #666666;
+  --border: #2a2a2a;
+  --border-light: #333333;
+  --accent: #ffd700;
+  --accent-hover: #e6c200;
+  --success: #00d084;
+  --warning: #ff9500;
+  --danger: #ff4757;
+  --info: #3742fa;
+  --purple: #8b5cf6;
+  --sidebar-width: 280px;
+  --header-height: 70px;
 }
 
 * {
@@ -33,7 +31,6 @@ body {
   background: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
 }
 
 .admin-app {
@@ -44,9 +41,8 @@ body {
 .main-content {
   flex: 1;
   margin-left: var(--sidebar-width);
-  padding: 24px;
 }
 
 .content-area {
-  padding: 20px;
+  padding: 2rem;
 }
