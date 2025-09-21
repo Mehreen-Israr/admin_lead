@@ -13,6 +13,9 @@ app.use(cors({
 app.use(express.json());
 
 // Routes
+app.get('/', (req, res) => {
+  res.json({ message: 'Admin Lead Backend API is running!', status: 'OK' });
+});
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/auth', require('./routes/auth')); // For admin login
 
