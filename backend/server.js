@@ -7,7 +7,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:3001', 'https://admin-lead-frontend.onrender.com'],
+  origin: ['http://localhost:3000', 'https://admin-lead-frontend.onrender.com'],
   credentials: true
 }));
 app.use(express.json());
