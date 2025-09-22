@@ -1,4 +1,13 @@
-const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5001';
+const getApiBaseUrl = () => {
+  // Check if we're in development and local backend is available
+  if (process.env.NODE_ENV === 'development') {
+    return process.env.REACT_APP_BACKEND_URL || 'http://localhost:5001';
+  }
+  // Production fallback
+  return process.env.REACT_APP_BACKEND_URL || 'https://admin-lead-backend.onrender.com';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 // Helper function to get auth headers
 const getAuthHeaders = () => {
