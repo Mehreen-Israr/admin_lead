@@ -9,6 +9,11 @@ const getApiBaseUrl = () => {
 
 const API_BASE_URL = getApiBaseUrl();
 
+// Helper function to get auth token
+const getAuthToken = () => {
+  return localStorage.getItem('adminToken');
+};
+
 // Helper function to get auth headers
 const getAuthHeaders = () => {
   const token = localStorage.getItem('adminToken');
