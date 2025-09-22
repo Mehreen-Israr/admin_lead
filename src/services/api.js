@@ -95,3 +95,57 @@ export const getDashboardStats = async () => {
     throw error;
   }
 };
+
+export const fetchNotifications = async (params = {}) => {
+  try {
+    const queryParams = new URLSearchParams(params).toString();
+    const response = await fetch(`${API_BASE_URL}/api/admin/notifications?${queryParams}`, {
+      headers: getAuthHeaders()
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch notifications');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    throw error;
+  }
+};
+
+export const markNotificationAsRead = async (notificationId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/admin/notifications/${notificationId}/read`, {
+      method: 'PUT',
+      headers: getAuthHeaders()
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to mark notification as read');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error marking notification as read:', error);
+    throw error;
+  }
+};
+
+export const markAllNotificationsAsRead = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/admin/notifications/mark-all-read`, {
+      method: 'PUT',
+      headers: getAuthHeaders()
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to mark all notifications as read');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error marking all notifications as read:', error);
+    throw error;
+  }
+};

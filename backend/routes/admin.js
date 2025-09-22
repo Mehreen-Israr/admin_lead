@@ -3,6 +3,8 @@ const router = express.Router();
 const User = require('../models/User');
 const Contact = require('../models/Contact');
 const adminAuth = require('../middleware/adminAuth');
+const Notification = require('../models/Notification');
+const NotificationService = require('../services/notificationService');
 
 // Get all users
 router.get('/users', adminAuth, async (req, res) => {
@@ -249,4 +251,143 @@ router.patch('/contacts/:id/status', adminAuth, async (req, res) => {
   }
 });
 
+// Get all notifications
+router.get('/notifications', adminAuth, async (req, res) => {
+  try {
+    const { page = 1, limit = 20, unreadOnly = false } = req.query;
+    const skip = (page - 1) * limit;
+    
+    const filter = unreadOnly === 'true' ? { isRead: false } : {};
+    
+    const notifications = await Notification.find(filter)
+      .populate('relatedId')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+    
+    const total = await Notification.countDocuments(filter);
+    const unreadCount = await Notification.countDocuments({ isRead: false });
+    
+    res.json({
+      success: true,
+      data: notifications,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        pages: Math.ceil(total / limit)
+      },
+      unreadCount
+    });
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching notifications'
+    });
+  }
+});
+
+// Mark notification as read
+router.put('/notifications/:id/read', adminAuth, async (req, res) => {
+  try {
+    const notification = await Notification.findByIdAndUpdate(
+      req.params.id,
+      { 
+        isRead: true,
+        readAt: new Date()
+      },
+      { new: true }
+    );
+    
+    if (!notification) {
+      return res.status(404).json({
+        success: false,
+        message: 'Notification not found'
+      });
+    }
+    
+    res.json({
+      success: true,
+      data: notification
+    });
+  } catch (error) {
+    console.error('Error marking notification as read:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while updating notification'
+    });
+  }
+});
+
+// Mark all notifications as read
+router.put('/notifications/mark-all-read', adminAuth, async (req, res) => {
+  try {
+    await Notification.updateMany(
+      { isRead: false },
+      { 
+        isRead: true,
+        readAt: new Date()
+      }
+    );
+    
+    res.json({
+      success: true,
+      message: 'All notifications marked as read'
+    });
+  } catch (error) {
+    console.error('Error marking all notifications as read:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while updating notifications'
+    });
+  }
+});
+
+// Delete notification
+router.delete('/notifications/:id', adminAuth, async (req, res) => {
+  try {
+    const notification = await Notification.findByIdAndDelete(req.params.id);
+    
+    if (!notification) {
+      return res.status(404).json({
+        success: false,
+        message: 'Notification not found'
+      });
+    }
+    
+    res.json({
+      success: true,
+      message: 'Notification deleted successfully'
+    });
+  } catch (error) {
+    console.error('Error deleting notification:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while deleting notification'
+    });
+  }
+});
+
+// In your contact creation route (or wherever contacts are created)
+router.post('/contacts', adminAuth, async (req, res) => {
+  try {
+    const contact = new Contact(req.body);
+    await contact.save();
+    
+    // Create notification for new contact
+    await NotificationService.createContactFormNotification(contact);
+    
+    res.json({
+      success: true,
+      data: contact
+    });
+  } catch (error) {
+    console.error('Error creating contact:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while creating contact'
+    });
+  }
+});
 module.exports = router;

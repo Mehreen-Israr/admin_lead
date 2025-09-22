@@ -1,20 +1,83 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { fetchNotifications, markNotificationAsRead, markAllNotificationsAsRead } from '../services/api';
 import './Header.css';
 
 const Header = ({ onLogout }) => {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [loading, setLoading] = useState(false);
   
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
     onLogout();
   };
 
-  const notifications = [
-    { id: 1, title: 'New user registered', time: '2 min ago', type: 'user' },
-    { id: 2, title: 'Contact form submitted', time: '5 min ago', type: 'contact' },
-    { id: 3, title: 'System update available', time: '1 hour ago', type: 'system' }
-  ];
+  // Fetch notifications on component mount
+  useEffect(() => {
+    loadNotifications();
+    
+    // Set up polling for real-time updates
+    const interval = setInterval(loadNotifications, 30000); // Poll every 30 seconds
+    
+    return () => clearInterval(interval);
+  }, []);
+
+  const loadNotifications = async () => {
+    try {
+      setLoading(true);
+      const response = await fetchNotifications({ limit: 10 });
+      setNotifications(response.data);
+      setUnreadCount(response.unreadCount);
+    } catch (error) {
+      console.error('Error loading notifications:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleNotificationClick = async (notification) => {
+    if (!notification.isRead) {
+      try {
+        await markNotificationAsRead(notification._id);
+        // Update local state
+        setNotifications(prev => 
+          prev.map(n => 
+            n._id === notification._id 
+              ? { ...n, isRead: true, readAt: new Date() }
+              : n
+          )
+        );
+        setUnreadCount(prev => Math.max(0, prev - 1));
+      } catch (error) {
+        console.error('Error marking notification as read:', error);
+      }
+    }
+  };
+
+  const handleMarkAllRead = async () => {
+    try {
+      await markAllNotificationsAsRead();
+      setNotifications(prev => 
+        prev.map(n => ({ ...n, isRead: true, readAt: new Date() }))
+      );
+      setUnreadCount(0);
+    } catch (error) {
+      console.error('Error marking all notifications as read:', error);
+    }
+  };
+
+  const formatTimeAgo = (date) => {
+    const now = new Date();
+    const notificationDate = new Date(date);
+    const diffInMinutes = Math.floor((now - notificationDate) / (1000 * 60));
+    
+    if (diffInMinutes < 1) return 'Just now';
+    if (diffInMinutes < 60) return `${diffInMinutes} min ago`;
+    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)} hour${Math.floor(diffInMinutes / 60) > 1 ? 's' : ''} ago`;
+    return `${Math.floor(diffInMinutes / 1440)} day${Math.floor(diffInMinutes / 1440) > 1 ? 's' : ''} ago`;
+  };
 
   return (
     <header className="header">
@@ -73,24 +136,51 @@ const Header = ({ onLogout }) => {
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
                 <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
               </svg>
-              <span className="notification-badge">3</span>
+              {unreadCount > 0 && (
+                <span className="notification-badge">{unreadCount}</span>
+              )}
             </button>
             
             {showNotifications && (
               <div className="notifications-dropdown">
                 <div className="dropdown-header">
                   <h3>Notifications</h3>
-                  <button className="mark-all-read">Mark all read</button>
+                  {unreadCount > 0 && (
+                    <button className="mark-all-read" onClick={handleMarkAllRead}>
+                      Mark all read
+                    </button>
+                  )}
                 </div>
                 <div className="notifications-list">
-                  {notifications.map(notification => (
-                    <div key={notification.id} className="notification-item">
+                  {loading ? (
+                    <div className="notification-item">
                       <div className="notification-content">
-                        <div className="notification-title">{notification.title}</div>
-                        <div className="notification-time">{notification.time}</div>
+                        <div className="notification-title">Loading...</div>
                       </div>
                     </div>
-                  ))}
+                  ) : notifications.length === 0 ? (
+                    <div className="notification-item">
+                      <div className="notification-content">
+                        <div className="notification-title">No notifications</div>
+                        <div className="notification-time">You're all caught up!</div>
+                      </div>
+                    </div>
+                  ) : (
+                    notifications.map(notification => (
+                      <div 
+                        key={notification._id} 
+                        className={`notification-item ${!notification.isRead ? 'unread' : ''}`}
+                        onClick={() => handleNotificationClick(notification)}
+                      >
+                        <div className="notification-content">
+                          <div className="notification-title">{notification.title}</div>
+                          <div className="notification-message">{notification.message}</div>
+                          <div className="notification-time">{formatTimeAgo(notification.createdAt)}</div>
+                        </div>
+                        {!notification.isRead && <div className="notification-dot"></div>}
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             )}

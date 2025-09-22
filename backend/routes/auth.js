@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const adminAuth = require('../middleware/adminAuth');
+const NotificationService = require('../services/notificationService');
 
 const router = express.Router();
 
@@ -76,7 +77,7 @@ router.post('/login', async (req, res) => {
         role: user.role
       }
     });
-
+    
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({
@@ -86,28 +87,87 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Verify token route
+// Token verification route
 router.get('/verify', adminAuth, async (req, res) => {
   try {
-    const user = await User.findById(req.user.userId).select('-password');
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
-    }
-
     res.json({
       success: true,
       user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role
+        id: req.user._id,
+        name: req.user.name,
+        email: req.user.email,
+        role: req.user.role
       }
     });
   } catch (error) {
     console.error('Token verification error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+});
+
+// User registration route (for creating new users, not login)
+router.post('/register', async (req, res) => {
+  try {
+    const { name, email, password, role = 'user' } = req.body;
+
+    // Validate input
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Name, email and password are required'
+      });
+    }
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: 'User with this email already exists'
+      });
+    }
+
+    // Create new user
+    const newUser = new User({
+      name,
+      email: email.toLowerCase(),
+      password,
+      role
+    });
+
+    await newUser.save();
+
+    // Create notification for new user registration
+    await NotificationService.createUserRegistrationNotification(newUser);
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { 
+        userId: newUser._id, 
+        email: newUser.email, 
+        role: newUser.role 
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRE || '24h' }
+    );
+
+    res.status(201).json({
+      success: true,
+      message: 'User registered successfully',
+      token,
+      user: {
+        id: newUser._id,
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role
+      }
+    });
+    
+  } catch (error) {
+    console.error('Registration error:', error);
     res.status(500).json({
       success: false,
       message: 'Internal server error'
