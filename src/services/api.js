@@ -279,3 +279,22 @@ export const getRecentActivity = async (limit = 10) => {
     throw error;
   }
 };
+
+// Get user by ID
+export const getUserById = async (userId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/admin/users/${userId}`, {
+      headers: getAuthHeaders()
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch user details');
+    }
+    
+    const result = await response.json();
+    return result.data;
+  } catch (error) {
+    console.error('Error fetching user details:', error);
+    throw error;
+  }
+};
