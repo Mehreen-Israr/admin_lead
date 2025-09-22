@@ -4,7 +4,7 @@
   left: var(--sidebar-width);
   right: 0;
   height: var(--header-height);
-  background: rgba(26, 26, 46, 0.8);
+  background: rgba(0, 0, 0, 0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border-primary);
@@ -65,7 +65,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  background: var(--bg-card);
+  background: rgba(0, 0, 0, 0.6);
   border: 1px solid var(--border-primary);
   border-radius: var(--border-radius-lg);
   padding: var(--space-sm) var(--space-md);
