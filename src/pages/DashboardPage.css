@@ -155,24 +155,78 @@
 }
 
 .stat-icon {
-  width: 60px;
-  height: 60px;
+  width: 70px;
+  height: 70px;
   border-radius: var(--border-radius-sm);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.1));
-  border: 1px solid rgba(255, 215, 0, 0.2);
-  box-shadow: var(--shadow-sm);
+  font-size: 28px;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 165, 0, 0.1));
+  border: 2px solid rgba(255, 215, 0, 0.3);
+  box-shadow: var(--shadow-gold), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  color: var(--primary-gold);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-icon::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+  transform: rotate(-45deg) translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.stat-card:hover .stat-icon {
+  transform: scale(1.1) rotate(5deg);
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.25), rgba(255, 165, 0, 0.2));
+  border-color: rgba(255, 215, 0, 0.5);
+  box-shadow: var(--shadow-gold-hover), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.stat-card:hover .stat-icon::before {
+  transform: rotate(-45deg) translateX(100%);
+}
+
+/* Specific icon colors for different stat types */
+.stat-icon.submissions {
+  background: linear-gradient(135deg, rgba(0, 208, 132, 0.15), rgba(255, 215, 0, 0.1));
+  border-color: rgba(0, 208, 132, 0.3);
+  color: var(--success);
+}
+
+.stat-icon.users {
+  background: linear-gradient(135deg, rgba(0, 168, 255, 0.15), rgba(255, 215, 0, 0.1));
+  border-color: rgba(0, 168, 255, 0.3);
+  color: var(--info);
+}
+
+.stat-icon.pending {
+  background: linear-gradient(135deg, rgba(255, 140, 0, 0.15), rgba(255, 215, 0, 0.1));
+  border-color: rgba(255, 140, 0, 0.3);
+  color: var(--warning);
 }
 
 .stat-number {
-  font-size: var(--font-3xl);
+  font-size: var(--font-4xl);
   font-weight: 900;
   color: var(--text-primary);
   line-height: 1;
   margin-bottom: var(--space-xs);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover .stat-number {
+  color: var(--primary-gold);
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+  transform: scale(1.05);
 }
 
 .stat-label {

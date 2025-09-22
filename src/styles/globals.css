@@ -104,14 +104,14 @@ h6 { font-size: var(--font-base); }
   align-items: center;
   justify-content: center;
   gap: var(--space-xs);
-  padding: var(--space-sm) var(--space-lg);
+  padding: var(--space-md) var(--space-xl);
   border: none;
   border-radius: var(--border-radius-sm);
   font-weight: 600;
-  font-size: var(--font-sm);
+  font-size: var(--font-base);
+  text-decoration: none;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  text-decoration: none;
   position: relative;
   overflow: hidden;
 }
@@ -126,18 +126,6 @@ h6 { font-size: var(--font-base); }
   transform: translateY(-2px);
   box-shadow: var(--shadow-gold-hover);
   filter: brightness(1.1);
-}
-
-/* Loading Animation */
-@keyframes shimmer {
-  0% { background-position: -200px 0; }
-  100% { background-position: calc(200px + 100%) 0; }
-}
-
-.loading {
-  background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.1), transparent);
-  background-size: 200px 100%;
-  animation: shimmer 1.5s infinite;
 }
 
 /* Scrollbar Styling */
@@ -155,5 +143,5 @@ h6 { font-size: var(--font-base); }
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-gold-light);
+  background: linear-gradient(180deg, var(--accent-gold), var(--primary-gold));
 }
