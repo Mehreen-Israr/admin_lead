@@ -158,7 +158,7 @@ export const markAllNotificationsAsRead = async () => {
 // Quick Actions API calls
 export const createUser = async (userData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/admin/users`, {
+    const response = await fetch(`${API_BASE_URL}/api/admin/users`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -181,7 +181,7 @@ export const createUser = async (userData) => {
 
 export const exportData = async (type, format = 'csv') => {
   try {
-    const response = await fetch(`${API_BASE_URL}/admin/export/${type}?format=${format}`, {
+    const response = await fetch(`${API_BASE_URL}/api/admin/export/${type}?format=${format}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${getAuthToken()}`
@@ -219,7 +219,7 @@ export const exportData = async (type, format = 'csv') => {
 
 export const getSystemSettings = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/admin/settings`, {
+    const response = await fetch(`${API_BASE_URL}/api/admin/settings`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${getAuthToken()}`
@@ -239,7 +239,7 @@ export const getSystemSettings = async () => {
 
 export const updateSystemSettings = async (settings) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/admin/settings`, {
+    const response = await fetch(`${API_BASE_URL}/api/admin/settings`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -262,7 +262,7 @@ export const updateSystemSettings = async (settings) => {
 
 export const getRecentActivity = async (limit = 10) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/admin/activity?limit=${limit}`, {
+    const response = await fetch(`${API_BASE_URL}/api/admin/activity?limit=${limit}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${getAuthToken()}`
