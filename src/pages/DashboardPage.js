@@ -13,6 +13,7 @@ const DashboardPage = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     loadDashboardStats();
@@ -20,10 +21,9 @@ const DashboardPage = () => {
 
   const loadDashboardStats = async () => {
     try {
-      setLoading(true);
+      setRefreshing(true);
       const data = await getDashboardStats();
       
-      // Handle both old and new API response formats
       const statsData = data.stats || data.data || {
         totalUsers: 0,
         totalContacts: 0,
@@ -38,7 +38,6 @@ const DashboardPage = () => {
     } catch (error) {
       console.error('Error loading dashboard stats:', error);
       setError('Failed to load dashboard statistics.');
-      // Set default values on error
       setStats({
         totalUsers: 0,
         totalContacts: 0,
@@ -49,115 +48,237 @@ const DashboardPage = () => {
       });
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
+
+  const StatCard = ({ icon, title, value, change, changeType, color, description }) => (
+    <div className={`stat-card ${color}`}>
+      <div className="stat-card-header">
+        <div className="stat-icon">
+          <i className={icon}></i>
+        </div>
+        <div className="stat-actions">
+          <button className="stat-menu-btn">
+            <i className="fas fa-ellipsis-h"></i>
+          </button>
+        </div>
+      </div>
+      <div className="stat-content">
+        <div className="stat-value">{typeof value === 'string' ? value : value.toLocaleString()}</div>
+        <div className="stat-title">{title}</div>
+        <div className="stat-description">{description}</div>
+        {change !== undefined && (
+          <div className={`stat-change ${changeType}`}>
+            <i className={`fas fa-arrow-${changeType === 'positive' ? 'up' : 'down'}`}></i>
+            <span>{Math.abs(change)} this week</span>
+          </div>
+        )}
+      </div>
+      <div className="stat-progress">
+        <div className="progress-bar">
+          <div className="progress-fill" style={{ width: `${Math.min(100, (typeof value === 'number' ? value : parseInt(value)) / 100 * 100)}%` }}></div>
+        </div>
+      </div>
+    </div>
+  );
 
   if (loading) {
     return (
       <div className="dashboard-loading">
-        <div className="loading-spinner"></div>
-        <p>Loading dashboard...</p>
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <div className="loading-text">
+            <h3>Loading Dashboard</h3>
+            <p>Fetching your latest data...</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="dashboard-page">
+      {/* Dashboard Header */}
       <div className="dashboard-header">
-        <h1>Dashboard Overview</h1>
-        <p>Welcome to LeadMagnet Admin Panel</p>
-        <button className="refresh-btn" onClick={loadDashboardStats}>
-          🔄 Refresh Data
-        </button>
+        <div className="header-content">
+          <div className="header-text">
+            <h1 className="dashboard-title">
+              <span className="title-gradient">Dashboard Overview</span>
+            </h1>
+            <p className="dashboard-subtitle">Welcome back! Here's what's happening with your lead magnet.</p>
+          </div>
+          <div className="header-actions">
+            <button 
+              className={`refresh-btn ${refreshing ? 'refreshing' : ''}`}
+              onClick={loadDashboardStats}
+              disabled={refreshing}
+            >
+              <i className="fas fa-sync-alt"></i>
+              <span>{refreshing ? 'Refreshing...' : 'Refresh Data'}</span>
+            </button>
+            <button className="export-btn">
+              <i className="fas fa-download"></i>
+              <span>Export</span>
+            </button>
+          </div>
+        </div>
       </div>
 
+      {/* Error Message */}
       {error && (
-        <div className="error-message">
-          {error}
+        <div className="error-banner">
+          <div className="error-content">
+            <i className="fas fa-exclamation-triangle"></i>
+            <div className="error-text">
+              <strong>Error:</strong> {error}
+            </div>
+            <button className="error-close" onClick={() => setError('')}>
+              <i className="fas fa-times"></i>
+            </button>
+          </div>
         </div>
       )}
 
-      <div className="stats-grid">
-        <div className="stat-card primary">
-          <div className="stat-icon">👥</div>
-          <div className="stat-content">
-            <h3>{stats.totalUsers}</h3>
-            <p>Total Users</p>
-            <span className="stat-change positive">+{stats.recentUsers} this week</span>
+      {/* Stats Grid */}
+      <div className="stats-section">
+        <div className="section-header">
+          <h2>Key Metrics</h2>
+          <div className="time-filter">
+            <button className="filter-btn active">7 Days</button>
+            <button className="filter-btn">30 Days</button>
+            <button className="filter-btn">90 Days</button>
           </div>
         </div>
-
-        <div className="stat-card secondary">
-          <div className="stat-icon">📧</div>
-          <div className="stat-content">
-            <h3>{stats.totalContacts}</h3>
-            <p>Contact Submissions</p>
-            <span className="stat-change positive">+{stats.recentContacts} this week</span>
-          </div>
+        
+        <div className="stats-grid">
+          <StatCard
+            icon="fas fa-users"
+            title="Total Users"
+            value={stats.totalUsers}
+            change={stats.recentUsers}
+            changeType="positive"
+            color="primary"
+            description="Registered users in your system"
+          />
+          
+          <StatCard
+            icon="fas fa-envelope"
+            title="Contact Submissions"
+            value={stats.totalContacts}
+            change={stats.recentContacts}
+            changeType="positive"
+            color="secondary"
+            description="Total contact form submissions"
+          />
+          
+          <StatCard
+            icon="fas fa-check-circle"
+            title="Verified Users"
+            value={stats.verifiedUsers}
+            change={Math.floor(stats.verifiedUsers * 0.1)}
+            changeType="positive"
+            color="success"
+            description="Users with verified email addresses"
+          />
+          
+          <StatCard
+            icon="fas fa-chart-line"
+            title="Verification Rate"
+            value={`${Math.round(stats.verificationRate)}%`}
+            change={5}
+            changeType="positive"
+            color="warning"
+            description="Percentage of verified users"
+          />
         </div>
+      </div>
 
-        <div className="stat-card success">
-          <div className="stat-icon">✅</div>
-          <div className="stat-content">
-            <h3>{stats.verifiedUsers}</h3>
-            <p>Verified Users</p>
-            <span className="stat-change neutral">{stats.verificationRate}% verified</span>
-          </div>
+      {/* Quick Actions */}
+      <div className="quick-actions-section">
+        <div className="section-header">
+          <h2>Quick Actions</h2>
         </div>
-
-        <div className="stat-card warning">
-          <div className="stat-icon">📊</div>
-          <div className="stat-content">
-            <h3>{stats.totalUsers - stats.verifiedUsers}</h3>
-            <p>Pending Verification</p>
-            <span className="stat-change neutral">{100 - stats.verificationRate}% pending</span>
+        <div className="quick-actions-grid">
+          <div className="action-card">
+            <div className="action-icon">
+              <i className="fas fa-user-plus"></i>
+            </div>
+            <div className="action-content">
+              <h3>Add New User</h3>
+              <p>Manually add a new user to the system</p>
+            </div>
+            <button className="action-btn">
+              <i className="fas fa-arrow-right"></i>
+            </button>
+          </div>
+          
+          <div className="action-card">
+            <div className="action-icon">
+              <i className="fas fa-file-export"></i>
+            </div>
+            <div className="action-content">
+              <h3>Export Data</h3>
+              <p>Download user and contact data</p>
+            </div>
+            <button className="action-btn">
+              <i className="fas fa-arrow-right"></i>
+            </button>
+          </div>
+          
+          <div className="action-card">
+            <div className="action-icon">
+              <i className="fas fa-cog"></i>
+            </div>
+            <div className="action-content">
+              <h3>System Settings</h3>
+              <p>Configure system preferences</p>
+            </div>
+            <button className="action-btn">
+              <i className="fas fa-arrow-right"></i>
+            </button>
           </div>
         </div>
       </div>
 
-      <div className="dashboard-content">
-        <div className="dashboard-section">
-          <div className="section-header">
-            <h2>📈 Quick Stats</h2>
-            <p>Overview of your platform metrics</p>
-          </div>
-          
-          <div className="quick-stats">
-            <div className="quick-stat">
-              <span className="stat-label">Active Users</span>
-              <span className="stat-value">{stats.verifiedUsers}</span>
-            </div>
-            <div className="quick-stat">
-              <span className="stat-label">New This Week</span>
-              <span className="stat-value">{stats.recentUsers}</span>
-            </div>
-            <div className="quick-stat">
-              <span className="stat-label">Contact Forms</span>
-              <span className="stat-value">{stats.recentContacts}</span>
-            </div>
-            <div className="quick-stat">
-              <span className="stat-label">Verification Rate</span>
-              <span className="stat-value">{stats.verificationRate}%</span>
-            </div>
-          </div>
+      {/* Recent Activity */}
+      <div className="activity-section">
+        <div className="section-header">
+          <h2>Recent Activity</h2>
+          <button className="view-all-btn">View All</button>
         </div>
-
-        <div className="dashboard-section">
-          <div className="section-header">
-            <h2>🚀 Quick Actions</h2>
-            <p>Common administrative tasks</p>
+        <div className="activity-list">
+          <div className="activity-item">
+            <div className="activity-icon success">
+              <i className="fas fa-user-check"></i>
+            </div>
+            <div className="activity-content">
+              <div className="activity-title">New user registered</div>
+              <div className="activity-description">john.doe@example.com joined the platform</div>
+              <div className="activity-time">2 minutes ago</div>
+            </div>
           </div>
           
-          <div className="quick-actions">
-            <button className="action-btn primary" onClick={() => window.location.href = '/users'}>
-              👥 Manage Users
-            </button>
-            <button className="action-btn secondary" onClick={() => window.location.href = '/contacts'}>
-              📧 View Contacts
-            </button>
-            <button className="action-btn success" onClick={loadDashboardStats}>
-              🔄 Refresh Stats
-            </button>
+          <div className="activity-item">
+            <div className="activity-icon primary">
+              <i className="fas fa-envelope"></i>
+            </div>
+            <div className="activity-content">
+              <div className="activity-title">Contact form submitted</div>
+              <div className="activity-description">New inquiry from potential customer</div>
+              <div className="activity-time">15 minutes ago</div>
+            </div>
+          </div>
+          
+          <div className="activity-item">
+            <div className="activity-icon warning">
+              <i className="fas fa-exclamation-triangle"></i>
+            </div>
+            <div className="activity-content">
+              <div className="activity-title">System maintenance</div>
+              <div className="activity-description">Scheduled maintenance completed successfully</div>
+              <div className="activity-time">1 hour ago</div>
+            </div>
           </div>
         </div>
       </div>
