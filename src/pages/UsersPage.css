@@ -122,10 +122,10 @@
 }
 
 .users-table-container {
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(13, 110, 253, 0.1);
   border-radius: 12px;
   overflow: hidden;
-  border: 1px solid #d4af37;
+  border: 1px solid #0d6efd;
 }
 
 .users-table {
@@ -134,8 +134,8 @@
 }
 
 .users-table th {
-  background: linear-gradient(135deg, #d4af37, #b8941f);
-  color: #000000;
+  background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+  color: #ffffff;
   padding: 1rem;
   text-align: left;
   font-weight: 600;
@@ -146,23 +146,23 @@
 
 .users-table td {
   padding: 1rem;
-  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  border-bottom: 1px solid rgba(13, 110, 253, 0.2);
   color: #ffffff;
 }
 
 .users-table tr:hover {
-  background: rgba(212, 175, 55, 0.1);
+  background: rgba(13, 110, 253, 0.15);
 }
 
 .user-avatar {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #d4af37, #b8941f);
+  background: linear-gradient(135deg, #0d6efd, #0b5ed7);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #000000;
+  color: #ffffff;
   font-weight: bold;
   font-size: 1.2rem;
   margin-right: 1rem;
@@ -180,7 +180,7 @@
 
 .user-name {
   font-weight: 600;
-  color: #d4af37;
+  color: #6ea8fe;
   margin-bottom: 0.25rem;
 }
 
@@ -346,16 +346,16 @@
 
 .pagination-btn {
   padding: 0.5rem 1rem;
-  border: 1px solid #d4af37;
+  border: 1px solid #0d6efd;
   border-radius: 6px;
   background: rgba(0, 0, 0, 0.3);
-  color: #d4af37;
+  color: #0d6efd;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .pagination-btn:hover:not(:disabled) {
-  background: rgba(212, 175, 55, 0.2);
+  background: rgba(13, 110, 253, 0.2);
   transform: translateY(-1px);
 }
 
@@ -385,8 +385,8 @@
 }
 
 .user-modal {
-  background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
-  border: 2px solid #d4af37;
+  background: linear-gradient(135deg, #1a1a2e, #2d2d2d);
+  border: 2px solid #0d6efd;
   border-radius: 12px;
   padding: 2rem;
   width: 90%;
@@ -493,8 +493,8 @@
 }
 
 .modal-header {
-  background: linear-gradient(135deg, #d4af37, #b8941f);
-  color: #000000;
+  background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+  color: #ffffff;
   padding: 1.5rem 2rem;
   display: flex;
   justify-content: space-between;
@@ -512,9 +512,9 @@
 }
 
 .close-btn {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.2);
   border: none;
-  color: #000000;
+  color: #ffffff;
   font-size: 1.8rem;
   cursor: pointer;
   padding: 0.5rem;
@@ -529,7 +529,7 @@
 }
 
 .close-btn:hover {
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(255, 255, 255, 0.3);
   transform: rotate(90deg);
 }
 
@@ -546,16 +546,16 @@
 }
 
 .detail-section {
-  background: rgba(212, 175, 55, 0.05);
-  border: 1px solid rgba(212, 175, 55, 0.2);
+  background: rgba(13, 110, 253, 0.05);
+  border: 1px solid rgba(13, 110, 253, 0.2);
   border-radius: 12px;
   padding: 1.5rem;
   transition: all 0.3s ease;
 }
 
 .detail-section:hover {
-  background: rgba(212, 175, 55, 0.08);
-  border-color: rgba(212, 175, 55, 0.3);
+  background: rgba(13, 110, 253, 0.08);
+  border-color: rgba(13, 110, 253, 0.3);
   transform: translateY(-2px);
 }
 
@@ -563,7 +563,7 @@
   font-family: 'Oswald', sans-serif;
   font-size: 1.3rem;
   font-weight: 600;
-  color: #d4af37;
+  color: #6ea8fe;
   margin: 0 0 1rem 0;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -576,7 +576,7 @@
   content: '';
   width: 4px;
   height: 20px;
-  background: linear-gradient(135deg, #d4af37, #b8941f);
+  background: linear-gradient(135deg, #0d6efd, #0b5ed7);
   border-radius: 2px;
 }
 
@@ -587,23 +587,23 @@
 }
 
 .detail-item {
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(212, 175, 55, 0.1);
+  background: rgba(13, 110, 253, 0.1);
+  border: 1px solid rgba(13, 110, 253, 0.2);
   border-radius: 8px;
   padding: 1rem;
   transition: all 0.3s ease;
 }
 
 .detail-item:hover {
-  background: rgba(0, 0, 0, 0.4);
-  border-color: rgba(212, 175, 55, 0.2);
+  background: rgba(13, 110, 253, 0.15);
+  border-color: rgba(13, 110, 253, 0.3);
   transform: translateY(-1px);
 }
 
 .detail-item label {
   display: block;
   font-weight: 600;
-  color: #d4af37;
+  color: #6ea8fe;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-size: 0.85rem;
