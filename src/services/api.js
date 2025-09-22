@@ -149,3 +149,128 @@ export const markAllNotificationsAsRead = async () => {
     throw error;
   }
 };
+
+// Quick Actions API calls
+export const createUser = async (userData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/admin/users`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getAuthToken()}`
+      },
+      body: JSON.stringify(userData)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to create user');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error creating user:', error);
+    throw error;
+  }
+};
+
+export const exportData = async (type, format = 'csv') => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/admin/export/${type}?format=${format}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to export data');
+    }
+
+    // Get filename from response headers
+    const contentDisposition = response.headers.get('Content-Disposition');
+    const filename = contentDisposition 
+      ? contentDisposition.split('filename="')[1].split('"')[0]
+      : `export_${type}_${new Date().toISOString().split('T')[0]}.${format}`;
+
+    const blob = await response.blob();
+    
+    // Create download link
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+
+    return { success: true, filename };
+  } catch (error) {
+    console.error('Error exporting data:', error);
+    throw error;
+  }
+};
+
+export const getSystemSettings = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/admin/settings`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch system settings');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching system settings:', error);
+    throw error;
+  }
+};
+
+export const updateSystemSettings = async (settings) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/admin/settings`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getAuthToken()}`
+      },
+      body: JSON.stringify(settings)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to update settings');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating system settings:', error);
+    throw error;
+  }
+};
+
+export const getRecentActivity = async (limit = 10) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/admin/activity?limit=${limit}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch recent activity');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching recent activity:', error);
+    throw error;
+  }
+};

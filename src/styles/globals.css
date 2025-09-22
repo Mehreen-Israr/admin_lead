@@ -17,10 +17,10 @@
   --accent-secondary: #f59e0b;
   --accent-tertiary: #d97706;
   
-  /* Background Colors */
-  --bg-primary: #0f0f23;
-  --bg-secondary: #1a1a2e;
-  --bg-tertiary: #16213e;
+  /* Background Colors - Updated to Pure Black Theme */
+  --bg-primary: #000000;
+  --bg-secondary: #0a0a0a;
+  --bg-tertiary: #141414;
   --bg-card: rgba(255, 255, 255, 0.05);
   --bg-card-hover: rgba(255, 255, 255, 0.08);
   --bg-glass: rgba(255, 255, 255, 0.1);
@@ -102,22 +102,36 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--accent-primary);
+  background: var(--border-primary);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-secondary);
+  background: var(--primary-600);
 }
 
-/* Selection Styling */
+/* Selection */
 ::selection {
-  background: var(--accent-primary);
+  background: var(--primary-600);
   color: var(--bg-primary);
 }
 
-/* Focus Styles */
+/* Focus styles */
 :focus-visible {
-  outline: 2px solid var(--accent-primary);
+  outline: 2px solid var(--primary-600);
   outline-offset: 2px;
+}
+
+/* Utility classes */
+.text-gradient {
+  background: linear-gradient(135deg, var(--primary-600), var(--accent-primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glass-effect {
+  backdrop-filter: blur(10px);
+  background: var(--bg-glass);
+  border: 1px solid var(--border-primary);
 }

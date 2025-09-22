@@ -5,6 +5,8 @@ const Contact = require('../models/Contact');
 const adminAuth = require('../middleware/adminAuth');
 const Notification = require('../models/Notification');
 const NotificationService = require('../services/notificationService');
+const bcrypt = require('bcryptjs');
+const json2csv = require('json2csv').parse;
 
 // Get all users
 router.get('/users', adminAuth, async (req, res) => {
@@ -390,4 +392,243 @@ router.post('/contacts', adminAuth, async (req, res) => {
     });
   }
 });
+
+// Add new user endpoint
+router.post('/users', adminAuth, async (req, res) => {
+  try {
+    const { name, email, password, role = 'user' } = req.body;
+
+    // Validation
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Name, email, and password are required'
+      });
+    }
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: 'User with this email already exists'
+      });
+    }
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Create user
+    const user = new User({
+      name,
+      email,
+      password: hashedPassword,
+      role,
+      isActive: true
+    });
+
+    await user.save();
+
+    // Create notification for user creation
+    await NotificationService.createNotification({
+      type: 'user_created',
+      title: 'New User Added',
+      message: `User ${name} has been manually added to the system`,
+      data: { userId: user._id, userEmail: email }
+    });
+
+    // Return user without password
+    const userResponse = user.toObject();
+    delete userResponse.password;
+
+    res.status(201).json({
+      success: true,
+      message: 'User created successfully',
+      data: userResponse
+    });
+  } catch (error) {
+    console.error('Error creating user:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while creating user'
+    });
+  }
+});
+
+// Export data endpoint
+router.get('/export/:type', adminAuth, async (req, res) => {
+  try {
+    const { type } = req.params;
+    const { format = 'csv' } = req.query;
+
+    let data = [];
+    let filename = '';
+
+    switch (type) {
+      case 'users':
+        data = await User.find({}).select('-password').lean();
+        filename = `users_export_${new Date().toISOString().split('T')[0]}.csv`;
+        break;
+      case 'contacts':
+        data = await Contact.find({}).lean();
+        filename = `contacts_export_${new Date().toISOString().split('T')[0]}.csv`;
+        break;
+      case 'all':
+        const users = await User.find({}).select('-password').lean();
+        const contacts = await Contact.find({}).lean();
+        data = { users, contacts };
+        filename = `full_export_${new Date().toISOString().split('T')[0]}.json`;
+        break;
+      default:
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid export type. Use: users, contacts, or all'
+        });
+    }
+
+    if (format === 'csv' && type !== 'all') {
+      const csv = json2csv(data);
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.send(csv);
+    } else {
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.json(data);
+    }
+
+    // Create notification for data export
+    await NotificationService.createNotification({
+      type: 'data_exported',
+      title: 'Data Export Completed',
+      message: `${type.charAt(0).toUpperCase() + type.slice(1)} data has been exported`,
+      data: { exportType: type, format, timestamp: new Date() }
+    });
+
+  } catch (error) {
+    console.error('Error exporting data:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while exporting data'
+    });
+  }
+});
+
+// System settings endpoints
+router.get('/settings', adminAuth, async (req, res) => {
+  try {
+    // For now, return basic system info
+    const settings = {
+      systemName: 'LeadMagnet Admin',
+      version: '1.0.0',
+      maintenance: false,
+      registrationEnabled: true,
+      emailNotifications: true,
+      maxUsers: 1000,
+      dataRetentionDays: 365
+    };
+
+    res.json({
+      success: true,
+      data: settings
+    });
+  } catch (error) {
+    console.error('Error fetching settings:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching settings'
+    });
+  }
+});
+
+router.put('/settings', adminAuth, async (req, res) => {
+  try {
+    const settings = req.body;
+    
+    // In a real app, you'd save these to a database
+    // For now, just return success
+    
+    // Create notification for settings update
+    await NotificationService.createNotification({
+      type: 'settings_updated',
+      title: 'System Settings Updated',
+      message: 'System configuration has been modified',
+      data: { updatedSettings: Object.keys(settings), timestamp: new Date() }
+    });
+
+    res.json({
+      success: true,
+      message: 'Settings updated successfully',
+      data: settings
+    });
+  } catch (error) {
+    console.error('Error updating settings:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while updating settings'
+    });
+  }
+});
+
+// Get recent activity
+router.get('/activity', adminAuth, async (req, res) => {
+  try {
+    const { limit = 10 } = req.query;
+    
+    // Get recent notifications as activity
+    const activities = await Notification.find({})
+      .sort({ createdAt: -1 })
+      .limit(parseInt(limit))
+      .lean();
+
+    // Transform notifications to activity format
+    const formattedActivities = activities.map(notification => ({
+      id: notification._id,
+      type: notification.type,
+      title: notification.title,
+      description: notification.message,
+      timestamp: notification.createdAt,
+      icon: getActivityIcon(notification.type),
+      color: getActivityColor(notification.type)
+    }));
+
+    res.json({
+      success: true,
+      data: formattedActivities
+    });
+  } catch (error) {
+    console.error('Error fetching activity:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching activity'
+    });
+  }
+});
+
+// Helper functions for activity formatting
+function getActivityIcon(type) {
+  const iconMap = {
+    'user_registered': 'fas fa-user-check',
+    'user_created': 'fas fa-user-plus',
+    'contact_submitted': 'fas fa-envelope',
+    'data_exported': 'fas fa-file-export',
+    'settings_updated': 'fas fa-cog',
+    'system_maintenance': 'fas fa-exclamation-triangle'
+  };
+  return iconMap[type] || 'fas fa-info-circle';
+}
+
+function getActivityColor(type) {
+  const colorMap = {
+    'user_registered': 'success',
+    'user_created': 'success',
+    'contact_submitted': 'primary',
+    'data_exported': 'info',
+    'settings_updated': 'warning',
+    'system_maintenance': 'warning'
+  };
+  return colorMap[type] || 'primary';
+}
+
 module.exports = router;

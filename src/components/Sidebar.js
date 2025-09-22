@@ -58,7 +58,7 @@ const Sidebar = () => {
                 </linearGradient>
               </defs>
               <rect x="10" y="10" width="80" height="80" rx="16" fill="url(#logoGradient)"/>
-              <rect x="25" y="25" width="50" height="50" rx="8" fill="#0f0f23"/>
+              <rect x="25" y="25" width="50" height="50" rx="8" fill="#000000"/>
               <rect x="35" y="35" width="30" height="30" rx="4" fill="url(#logoGradient)"/>
             </svg>
           </div>
@@ -99,18 +99,6 @@ const Sidebar = () => {
           </div>
         </div>
       </nav>
-      
-      <div className="sidebar-footer">
-        <div className="user-profile">
-          <div className="user-avatar">
-            <div className="avatar-placeholder">A</div>
-          </div>
-          <div className="user-info">
-            <div className="user-name">Admin User</div>
-            <div className="user-role">Administrator</div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };
