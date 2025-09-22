@@ -175,7 +175,7 @@ const DashboardPage = () => {
           <div className="header-actions">
             <button 
               className={`refresh-btn ${refreshing ? 'refreshing' : ''}`}
-              onClick={loadDashboardStats}
+              onClick={loadDashboardData}
               disabled={refreshing}
             >
               <i className="fas fa-sync-alt"></i>
