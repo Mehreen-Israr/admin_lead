@@ -33,7 +33,7 @@ class NotificationService {
     return this.createNotification({
       title: 'New user registered',
       message: `${user.name} (${user.email}) has registered`,
-      type: 'user',
+      type: 'user_registered',
       priority: 'medium',
       relatedId: user._id,
       relatedModel: 'User',
@@ -48,7 +48,7 @@ class NotificationService {
     return this.createNotification({
       title: 'Contact form submitted',
       message: `New contact from ${contact.name} (${contact.email})`,
-      type: 'contact',
+      type: 'contact_submitted',
       priority: 'high',
       relatedId: contact._id,
       relatedModel: 'Contact',

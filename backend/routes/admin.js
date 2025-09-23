@@ -435,7 +435,10 @@ router.post('/users', adminAuth, async (req, res) => {
       type: 'user_created',
       title: 'New User Added',
       message: `User ${name} has been manually added to the system`,
-      data: { userId: user._id, userEmail: email }
+      priority: 'medium',
+      relatedId: user._id,
+      relatedModel: 'User',
+      metadata: { userId: user._id, userEmail: email }
     });
 
     // Return user without password
