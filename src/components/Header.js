@@ -91,89 +91,15 @@ const Header = ({ onLogout }) => {
           </div>
         </div>
 
-        {/* Center Section */}
-        <div className="header-center">
-          <div className="search-container">
-            <div className="search-icon">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="11" cy="11" r="8"/>
-                <path d="M21 21l-4.35-4.35"/>
-              </svg>
-            </div>
-            <input 
-              type="text" 
-              placeholder="Search anything..." 
-              className="search-input"
-            />
-            <div className="search-shortcut">⌘K</div>
-          </div>
-        </div>
+       
 
         {/* Right Section */}
         <div className="header-right">
           {/* Quick Actions */}
           
 
-          {/* Notifications */}
-          <div className="header-action notification-container">
-            <button 
-              className="notification-btn"
-              onClick={() => setShowNotifications(!showNotifications)}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-              </svg>
-              {unreadCount > 0 && (
-                <span className="notification-badge">{unreadCount}</span>
-              )}
-            </button>
-            
-            {showNotifications && (
-              <div className="notifications-dropdown">
-                <div className="dropdown-header">
-                  <h3>Notifications</h3>
-                  {unreadCount > 0 && (
-                    <button className="mark-all-read" onClick={handleMarkAllRead}>
-                      Mark all read
-                    </button>
-                  )}
-                </div>
-                <div className="notifications-list">
-                  {loading ? (
-                    <div className="notification-item">
-                      <div className="notification-content">
-                        <div className="notification-title">Loading...</div>
-                      </div>
-                    </div>
-                  ) : notifications.length === 0 ? (
-                    <div className="notification-item">
-                      <div className="notification-content">
-                        <div className="notification-title">No notifications</div>
-                        <div className="notification-time">You're all caught up!</div>
-                      </div>
-                    </div>
-                  ) : (
-                    notifications.map(notification => (
-                      <div 
-                        key={notification._id} 
-                        className={`notification-item ${!notification.isRead ? 'unread' : ''}`}
-                        onClick={() => handleNotificationClick(notification)}
-                      >
-                        <div className="notification-content">
-                          <div className="notification-title">{notification.title}</div>
-                          <div className="notification-message">{notification.message}</div>
-                          <div className="notification-time">{formatTimeAgo(notification.createdAt)}</div>
-                        </div>
-                        {!notification.isRead && <div className="notification-dot"></div>}
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-
+       
+          
           {/* User Menu */}
           <div className="header-action user-menu-container">
             <button 
