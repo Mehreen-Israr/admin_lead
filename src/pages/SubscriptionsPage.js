@@ -144,7 +144,14 @@ const SubscriptionsPage = () => {
             <p className="contacts-subtitle">Manage all subscription packages fetched from the database.</p>
           </div>
           <div className="header-actions">
-            <button className="action-btn btn-primary" onClick={startCreate}>
+            <button
+              className="action-btn btn-primary"
+              style={{
+                background: 'linear-gradient(135deg, var(--primary-600), var(--accent-primary))',
+                boxShadow: '0 8px 20px rgba(251, 191, 36, 0.25)'
+              }}
+              onClick={startCreate}
+            >
               <i className="fas fa-plus" /> New Package
             </button>
             <button className="refresh-btn" onClick={loadPackages}>
@@ -236,13 +243,26 @@ const SubscriptionsPage = () => {
                       )}
                     </div>
                   </div>
-                  <div className="contact-actions">
-                    <button className="action-btn btn-secondary" onClick={() => startEdit(pkg)}>
-                      <i className="fas fa-pen" /> Edit
-                    </button>
-                    <button className="action-btn btn-tertiary" onClick={() => onDelete(pkg._id)}>
-                      <i className="fas fa-trash" /> Delete
-                    </button>
+                  <div className="contact-actions" style={{justifyContent:'space-between'}}>
+                    <div style={{display:'flex',gap:'8px'}}>
+                      <button
+                        className="action-btn btn-secondary"
+                        style={{borderColor:'var(--primary-400)', color:'var(--primary-400)'}}
+                        onClick={() => startEdit(pkg)}
+                      >
+                        <i className="fas fa-pen" /> Edit
+                      </button>
+                      <button
+                        className="action-btn btn-tertiary"
+                        style={{borderColor:'rgba(239,68,68,0.35)', color:'#f87171'}}
+                        onClick={() => onDelete(pkg._id)}
+                      >
+                        <i className="fas fa-trash" /> Delete
+                      </button>
+                    </div>
+                    <div style={{opacity:0.85,fontSize:'0.85rem',color:'var(--text-tertiary)'}}>
+                      <i className="fas fa-clock" /> Updated {new Date(pkg.updatedAt || pkg.createdAt).toLocaleDateString()}
+                    </div>
                   </div>
                 </div>
               ))}
