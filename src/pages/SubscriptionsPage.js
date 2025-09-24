@@ -148,7 +148,13 @@ const SubscriptionsPage = () => {
               className="action-btn btn-primary"
               style={{
                 background: 'linear-gradient(135deg, var(--primary-600), var(--accent-primary))',
-                boxShadow: '0 8px 20px rgba(251, 191, 36, 0.25)'
+                boxShadow: '0 8px 20px rgba(251, 191, 36, 0.25)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '10px 14px',
+                borderRadius: '10px',
+                whiteSpace: 'nowrap'
               }}
               onClick={startCreate}
             >
@@ -247,14 +253,32 @@ const SubscriptionsPage = () => {
                     <div style={{display:'flex',gap:'8px'}}>
                       <button
                         className="action-btn btn-secondary"
-                        style={{borderColor:'var(--primary-400)', color:'var(--primary-400)'}}
+                        style={{
+                          borderColor:'var(--primary-400)',
+                          color:'var(--primary-400)',
+                          display:'inline-flex',
+                          alignItems:'center',
+                          gap:'8px',
+                          padding:'8px 12px',
+                          borderRadius:'10px',
+                          whiteSpace:'nowrap'
+                        }}
                         onClick={() => startEdit(pkg)}
                       >
                         <i className="fas fa-pen" /> Edit
                       </button>
                       <button
                         className="action-btn btn-tertiary"
-                        style={{borderColor:'rgba(239,68,68,0.35)', color:'#f87171'}}
+                        style={{
+                          borderColor:'rgba(239,68,68,0.35)',
+                          color:'#f87171',
+                          display:'inline-flex',
+                          alignItems:'center',
+                          gap:'8px',
+                          padding:'8px 12px',
+                          borderRadius:'10px',
+                          whiteSpace:'nowrap'
+                        }}
                         onClick={() => onDelete(pkg._id)}
                       >
                         <i className="fas fa-trash" /> Delete
