@@ -12,15 +12,17 @@ const PackageSchema = new mongoose.Schema(
     imageUrl: { type: String, trim: true },
     // New pricing object structure matching DB
     pricing: {
-      currency: { type: String, default: 'USD' },
+      currency: { type: String, trim: true },
+      // Some documents keep amount at root (price). Keep optional amount for future use.
       amount: { type: Number, min: 0 },
       discount: { type: String, trim: true },
       popular: { type: Boolean, default: false },
       trialDays: { type: Number, default: 0 }
     },
-    // Legacy flat price/currency for compatibility (optional)
-    price: { type: Number, min: 0 },
-    currency: { type: String, default: 'USD' },
+    // Root price mirrors your collection (required)
+    price: { type: Number, required: true, min: 0 },
+    // Root currency is legacy/fallback only
+    currency: { type: String, trim: true },
     isActive: { type: Boolean, default: true },
     sortOrder: { type: Number, default: 0 }
   },
@@ -31,7 +33,7 @@ const PackageSchema = new mongoose.Schema(
 PackageSchema.pre('save', function (next) {
   if (!this.logo && this.imageUrl) this.logo = this.imageUrl;
   if (!this.imageUrl && this.logo) this.imageUrl = this.logo;
-  // Map legacy price/currency into pricing.amount/currency when provided
+  // Map root price/currency into pricing object when provided
   if (this.price != null && (!this.pricing || this.pricing.amount == null)) {
     this.pricing = this.pricing || {};
     this.pricing.amount = this.price;
