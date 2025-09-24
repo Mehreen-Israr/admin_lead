@@ -252,8 +252,8 @@ const SubscriptionsPage = () => {
       )}
 
       {showForm && (
-        <div className="modal-overlay" style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:1000}}>
-          <div className="modal-card" style={{background:'var(--bg-card)',border:'1px solid var(--border-primary)',borderRadius:'12px',padding:'24px',width:'min(680px, 92vw)'}}>
+        <div className="modal-overlay" style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'flex-start',justifyContent:'center',zIndex:1000,overflowY:'auto',padding:'32px 16px'}}>
+          <div className="modal-card" style={{background:'var(--bg-card)',border:'1px solid var(--border-primary)',borderRadius:'12px',padding:'24px',width:'min(680px, 92vw)',maxHeight:'90vh',overflowY:'auto'}}>
             <h3 style={{marginTop:0}}>{editingId ? 'Edit Package' : 'Create Package'}</h3>
             <form onSubmit={onSubmit} style={{display:'grid',gap:'12px'}}>
               <div>
