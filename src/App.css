@@ -68,31 +68,55 @@ body {
 @media (max-width: 1024px) {
   .main-content {
     margin-left: 0;
+    transition: margin-left 0.3s ease;
   }
   
-  /* When sidebar is open on tablet, push content */
-  body.sidebar-open .main-content {
-    margin-left: var(--sidebar-width);
-  }
-  
-  .content-area {
-    padding: var(--space-md);
-    border-radius: 16px 0 0 0;
+  .sidebar-open .main-content {
+    margin-left: 280px;
   }
 }
 
 @media (max-width: 768px) {
   .main-content {
     margin-left: 0 !important;
-  }
-  
-  /* On mobile, don't push content, use overlay instead */
-  body.sidebar-open .main-content {
-    margin-left: 0 !important;
+    width: 100%;
   }
   
   .content-area {
-    padding: var(--space-sm);
-    border-radius: 12px 0 0 0;
+    padding: 0;
+    margin: 0;
   }
+  
+  /* Ensure all page containers work with mobile sidebar */
+  .sidebar-open .main-content {
+    margin-left: 0;
+  }
+  
+  /* Add overlay when sidebar is open on mobile */
+  .sidebar-open::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+  }
+}
+
+@media (max-width: 480px) {
+  .content-area {
+    min-height: calc(100vh - 60px);
+  }
+}
+
+/* When sidebar is open on tablet, push content */
+body.sidebar-open .main-content {
+  margin-left: var(--sidebar-width);
+}
+
+.content-area {
+  padding: var(--space-md);
+  border-radius: 16px 0 0 0;
 }
