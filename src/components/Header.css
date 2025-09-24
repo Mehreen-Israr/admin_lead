@@ -28,6 +28,18 @@
   gap: var(--space-lg);
 }
 
+.mobile-menu-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--border-radius-md);
+  background: var(--bg-card);
+  border: 1px solid var(--border-primary);
+  color: var(--text-secondary);
+}
+
 .header-breadcrumb {
   display: flex;
   align-items: center;
@@ -429,6 +441,7 @@
   .header {
     left: 0;
   }
+  .mobile-menu-btn { display: flex; }
   
   .header-center {
     display: none;

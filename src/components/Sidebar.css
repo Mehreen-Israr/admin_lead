@@ -210,7 +210,7 @@
     transition: transform var(--transition-normal);
   }
   
-  .sidebar.open {
+  body.sidebar-open .sidebar {
     transform: translateX(0);
   }
 }
