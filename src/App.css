@@ -27,12 +27,6 @@ body {
   transition: margin-left var(--transition-normal);
 }
 
-@media (max-width: 768px) {
-  .main-content {
-    margin-left: 0 !important;
-  }
-}
-
 .content-area {
   flex: 1;
   padding: var(--space-lg);
@@ -76,6 +70,11 @@ body {
     margin-left: 0;
   }
   
+  /* When sidebar is open on tablet, push content */
+  body.sidebar-open .main-content {
+    margin-left: var(--sidebar-width);
+  }
+  
   .content-area {
     padding: var(--space-md);
     border-radius: 16px 0 0 0;
@@ -83,6 +82,15 @@ body {
 }
 
 @media (max-width: 768px) {
+  .main-content {
+    margin-left: 0 !important;
+  }
+  
+  /* On mobile, don't push content, use overlay instead */
+  body.sidebar-open .main-content {
+    margin-left: 0 !important;
+  }
+  
   .content-area {
     padding: var(--space-sm);
     border-radius: 12px 0 0 0;
