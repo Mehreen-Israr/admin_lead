@@ -144,20 +144,7 @@ const SubscriptionsPage = () => {
             <p className="contacts-subtitle">Manage all subscription packages fetched from the database.</p>
           </div>
           <div className="header-actions">
-            <button
-              className="action-btn btn-primary"
-              style={{
-                background: 'linear-gradient(135deg, var(--primary-600), var(--accent-primary))',
-                boxShadow: '0 8px 20px rgba(251, 191, 36, 0.25)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '10px 14px',
-                borderRadius: '10px',
-                whiteSpace: 'nowrap'
-              }}
-              onClick={startCreate}
-            >
+            <button className="refresh-btn" onClick={startCreate}>
               <i className="fas fa-plus" /> New Package
             </button>
             <button className="refresh-btn" onClick={loadPackages}>
@@ -251,36 +238,10 @@ const SubscriptionsPage = () => {
                   </div>
                   <div className="contact-actions" style={{justifyContent:'space-between'}}>
                     <div style={{display:'flex',gap:'8px'}}>
-                      <button
-                        className="action-btn btn-secondary"
-                        style={{
-                          borderColor:'var(--primary-400)',
-                          color:'var(--primary-400)',
-                          display:'inline-flex',
-                          alignItems:'center',
-                          gap:'8px',
-                          padding:'8px 12px',
-                          borderRadius:'10px',
-                          whiteSpace:'nowrap'
-                        }}
-                        onClick={() => startEdit(pkg)}
-                      >
+                      <button className="refresh-btn" onClick={() => startEdit(pkg)}>
                         <i className="fas fa-pen" /> Edit
                       </button>
-                      <button
-                        className="action-btn btn-tertiary"
-                        style={{
-                          borderColor:'rgba(239,68,68,0.35)',
-                          color:'#f87171',
-                          display:'inline-flex',
-                          alignItems:'center',
-                          gap:'8px',
-                          padding:'8px 12px',
-                          borderRadius:'10px',
-                          whiteSpace:'nowrap'
-                        }}
-                        onClick={() => onDelete(pkg._id)}
-                      >
+                      <button className="refresh-btn" style={{borderColor:'rgba(239,68,68,0.35)', color:'#f87171'}} onClick={() => onDelete(pkg._id)}>
                         <i className="fas fa-trash" /> Delete
                       </button>
                     </div>
