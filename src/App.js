@@ -14,6 +14,12 @@ import Login from './pages/Login';
 // Create a separate component for the main app content
 function AppContent() {
   const { user, loading, logout } = useAuth();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const closeSidebar = () => {
+    setSidebarOpen(false);
+    document.body.classList.remove('sidebar-open');
+  };
 
   if (loading) {
     return <div className="loading-screen">Loading...</div>;
@@ -25,9 +31,9 @@ function AppContent() {
 
   return (
     <div className="admin-app">
-      <Sidebar />
+      <Sidebar onNavigate={closeSidebar} />
       <div className="main-content">
-        <Header onLogout={logout} />
+        <Header onLogout={logout} sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
         <div className="content-area">
           <Routes>
             <Route path="/" element={<DashboardPage />} />

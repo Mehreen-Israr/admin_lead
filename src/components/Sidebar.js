@@ -2,8 +2,15 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './Sidebar.css';
 
-const Sidebar = () => {
+const Sidebar = ({ onNavigate }) => {
   const location = useLocation();
+
+  const handleNavClick = () => {
+    // Close sidebar on mobile when navigating
+    if (onNavigate) {
+      onNavigate();
+    }
+  };
 
   const navigationItems = [
     {
@@ -88,6 +95,7 @@ const Sidebar = () => {
               key={item.path}
               to={item.path} 
               className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}
+              onClick={handleNavClick}
             >
               <div className="nav-icon">{item.icon}</div>
               <span className="nav-label">{item.label}</span>
