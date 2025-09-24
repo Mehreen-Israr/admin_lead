@@ -8,6 +8,7 @@ import Header from './components/Header';
 import DashboardPage from './pages/DashboardPage';
 import UsersPage from './pages/UsersPage';
 import ContactsPage from './pages/ContactsPage';
+import SubscriptionsPage from './pages/SubscriptionsPage';
 import Login from './pages/Login';
 
 // Create a separate component for the main app content
@@ -32,6 +33,7 @@ function AppContent() {
             <Route path="/" element={<DashboardPage />} />
             <Route path="/users" element={<UsersPage />} />
             <Route path="/contacts" element={<ContactsPage />} />
+            <Route path="/subscriptions" element={<SubscriptionsPage />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </div>

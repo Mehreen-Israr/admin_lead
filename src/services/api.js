@@ -280,6 +280,76 @@ export const getRecentActivity = async (limit = 10) => {
   }
 };
 
+// Packages API
+export const fetchPackages = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/admin/packages`, {
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch packages');
+    }
+    const result = await response.json();
+    return result.data || [];
+  } catch (error) {
+    console.error('Error fetching packages:', error);
+    throw error;
+  }
+};
+
+export const createPackage = async (payload) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/admin/packages`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.message || 'Failed to create package');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error creating package:', error);
+    throw error;
+  }
+};
+
+export const updatePackage = async (id, payload) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/admin/packages/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.message || 'Failed to update package');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating package:', error);
+    throw error;
+  }
+};
+
+export const deletePackage = async (id) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/admin/packages/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.message || 'Failed to delete package');
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error deleting package:', error);
+    throw error;
+  }
+};
+
 // Get user by ID
 export const getUserById = async (userId) => {
   try {

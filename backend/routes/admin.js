@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require('../models/User');
 const Contact = require('../models/Contact');
 const adminAuth = require('../middleware/adminAuth');
+const Package = require('../models/Package');
 const Notification = require('../models/Notification');
 const NotificationService = require('../services/notificationService');
 const bcrypt = require('bcryptjs');
@@ -177,6 +178,96 @@ router.delete('/contacts/:id', adminAuth, async (req, res) => {
       success: false,
       message: 'Server error while deleting contact'
     });
+  }
+});
+
+// Packages CRUD
+router.get('/packages', adminAuth, async (req, res) => {
+  try {
+    const packages = await Package.find({}).sort({ createdAt: -1 });
+    res.json({ success: true, count: packages.length, data: packages });
+  } catch (error) {
+    console.error('Error fetching packages:', error);
+    res.status(500).json({ success: false, message: 'Server error while fetching packages' });
+  }
+});
+
+router.get('/packages/:id', adminAuth, async (req, res) => {
+  try {
+    const pkg = await Package.findById(req.params.id);
+    if (!pkg) {
+      return res.status(404).json({ success: false, message: 'Package not found' });
+    }
+    res.json({ success: true, data: pkg });
+  } catch (error) {
+    console.error('Error fetching package:', error);
+    res.status(500).json({ success: false, message: 'Server error while fetching package' });
+  }
+});
+
+router.post('/packages', adminAuth, async (req, res) => {
+  try {
+    const body = req.body || {};
+    const pkg = new Package({
+      name: body.name,
+      platform: body.platform,
+      description: body.description,
+      features: Array.isArray(body.features) ? body.features : (body.features ? [body.features] : []),
+      logo: body.logo,
+      benefits: Array.isArray(body.benefits) ? body.benefits : (body.benefits ? [body.benefits] : []),
+      imageUrl: body.imageUrl,
+      pricing: body.pricing,
+      price: body.price,
+      currency: body.currency,
+      isActive: body.isActive !== undefined ? body.isActive : true,
+      sortOrder: body.sortOrder
+    });
+    await pkg.save();
+    res.status(201).json({ success: true, data: pkg });
+  } catch (error) {
+    console.error('Error creating package:', error);
+    res.status(500).json({ success: false, message: 'Server error while creating package' });
+  }
+});
+
+router.put('/packages/:id', adminAuth, async (req, res) => {
+  try {
+    const body = req.body || {};
+    const update = {
+      name: body.name,
+      platform: body.platform,
+      description: body.description,
+      features: Array.isArray(body.features) ? body.features : (body.features ? [body.features] : []),
+      logo: body.logo,
+      benefits: Array.isArray(body.benefits) ? body.benefits : (body.benefits ? [body.benefits] : []),
+      imageUrl: body.imageUrl,
+      pricing: body.pricing,
+      price: body.price,
+      currency: body.currency,
+      isActive: body.isActive,
+      sortOrder: body.sortOrder
+    };
+    const pkg = await Package.findByIdAndUpdate(req.params.id, update, { new: true, runValidators: true });
+    if (!pkg) {
+      return res.status(404).json({ success: false, message: 'Package not found' });
+    }
+    res.json({ success: true, data: pkg });
+  } catch (error) {
+    console.error('Error updating package:', error);
+    res.status(500).json({ success: false, message: 'Server error while updating package' });
+  }
+});
+
+router.delete('/packages/:id', adminAuth, async (req, res) => {
+  try {
+    const pkg = await Package.findByIdAndDelete(req.params.id);
+    if (!pkg) {
+      return res.status(404).json({ success: false, message: 'Package not found' });
+    }
+    res.json({ success: true, message: 'Package deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting package:', error);
+    res.status(500).json({ success: false, message: 'Server error while deleting package' });
   }
 });
 
