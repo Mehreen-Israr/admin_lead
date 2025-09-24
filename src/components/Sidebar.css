@@ -213,6 +213,12 @@
   body.sidebar-open .sidebar {
     transform: translateX(0);
   }
+  
+  /* Push main content when sidebar is open */
+  body.sidebar-open .main-content {
+    margin-left: var(--sidebar-width);
+    transition: margin-left var(--transition-normal);
+  }
 }
 
 @media (max-width: 768px) {
@@ -231,6 +237,11 @@
   
   .nav-badge {
     display: block;
+  }
+  
+  /* For mobile, use overlay instead of pushing content */
+  body.sidebar-open .main-content {
+    margin-left: 0;
   }
   
   /* Add overlay for mobile */
