@@ -3,8 +3,11 @@ import { fetchNotifications, markNotificationAsRead, markAllNotificationsAsRead 
 import './Header.css';
 
 const Header = ({ onLogout, sidebarOpen, setSidebarOpen }) => {
-  // Remove local sidebarOpen state
-  // const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (sidebarOpen) {
