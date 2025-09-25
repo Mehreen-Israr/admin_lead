@@ -19,10 +19,45 @@ const DashboardPage = () => {
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [systemSettings, setSystemSettings] = useState({});
   const [newUser, setNewUser] = useState({ name: '', email: '', password: '', role: 'user' });
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordValid, setPasswordValid] = useState(false);
 
- useEffect(() => {
+  useEffect(() => {
     loadDashboardData();
   }, []);
+
+  // Password validation function
+  const validatePassword = (password) => {
+    const minLength = 6;
+    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+    
+    if (password.length < minLength) {
+      return {
+        valid: false,
+        error: `Password must be at least ${minLength} characters long`
+      };
+    }
+    
+    if (!hasSpecialChar) {
+      return {
+        valid: false,
+        error: 'Password must contain at least one special character (!@#$%^&*()_+-=[]{}|;:,.<>?)'
+      };
+    }
+    
+    return {
+      valid: true,
+      error: ''
+    };
+  };
+
+  // Handle password change with validation
+  const handlePasswordChange = (password) => {
+    setNewUser({...newUser, password});
+    const validation = validatePassword(password);
+    setPasswordValid(validation.valid);
+    setPasswordError(validation.error);
+  };
 
   const loadDashboardData = async () => {
     try {
@@ -64,10 +99,19 @@ const DashboardPage = () => {
 
   const handleAddUser = async (e) => {
     e.preventDefault();
+    
+    // Validate password before submission
+    if (!passwordValid) {
+      alert('Please fix password validation errors before creating the user.');
+      return;
+    }
+    
     try {
       await createUser(newUser);
       setShowUserModal(false);
       setNewUser({ name: '', email: '', password: '', role: 'user' });
+      setPasswordError('');
+      setPasswordValid(false);
       loadDashboardData(); // Refresh data
       alert('User created successfully!');
     } catch (error) {
@@ -367,9 +411,22 @@ const DashboardPage = () => {
                 <input
                   type="password"
                   value={newUser.password}
-                  onChange={(e) => setNewUser({...newUser, password: e.target.value})}
+                  onChange={(e) => handlePasswordChange(e.target.value)}
                   required
+                  className={passwordError ? 'error' : passwordValid ? 'valid' : ''}
                 />
+                {passwordError && (
+                  <div className="validation-error">
+                    <i className="fas fa-exclamation-triangle"></i>
+                    {passwordError}
+                  </div>
+                )}
+                {passwordValid && (
+                  <div className="validation-success">
+                    <i className="fas fa-check-circle"></i>
+                    Password meets requirements
+                  </div>
+                )}
               </div>
               <div className="form-group">
                 <label>Role</label>
@@ -385,7 +442,11 @@ const DashboardPage = () => {
                 <button type="button" className="btn-secondary" onClick={() => setShowUserModal(false)}>
                   Cancel
                 </button>
-                <button type="submit" className="btn-primary">
+                <button 
+                  type="submit" 
+                  className="btn-primary"
+                  disabled={!passwordValid}
+                >
                   Create User
                 </button>
               </div>
