@@ -429,3 +429,22 @@ export const archiveContact = async (contactId, isArchived) => {
     throw error;
   }
 };
+
+export const sendReplyEmail = async (contactId, subject, message, adminEmail) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/admin/contacts/${contactId}/reply`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ subject, message, adminEmail })
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to send reply email');
+    }
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error('Error sending reply email:', error);
+    throw error;
+  }
+};

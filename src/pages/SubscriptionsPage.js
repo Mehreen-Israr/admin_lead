@@ -87,7 +87,13 @@ const SubscriptionsPage = () => {
       return;
     }
     
-    if (!form.price || form.price === '') {
+    // Check pricing.amount since that's what the form uses
+    const hasPrice = form.pricing.amount && form.pricing.amount !== '';
+    console.log('Form price validation:', { 
+      pricingAmount: form.pricing.amount, 
+      hasPrice 
+    });
+    if (!hasPrice) {
       alert('Price is required');
       return;
     }
@@ -103,11 +109,11 @@ const SubscriptionsPage = () => {
         benefits: form.benefits.split(',').map((b) => b.trim()).filter(Boolean),
         imageUrl: form.imageUrl,
         // keep both structures to match backend compatibility
-        price: form.price !== '' ? Number(form.price) : 0,
-        currency: form.currency,
+        price: form.pricing.amount !== '' ? Number(form.pricing.amount) : (form.price !== '' ? Number(form.price) : 0),
+        currency: form.pricing.currency || form.currency,
         pricing: {
           currency: form.pricing.currency,
-          amount: form.pricing.amount !== '' ? Number(form.pricing.amount) : (form.price !== '' ? Number(form.price) : 0),
+          amount: form.pricing.amount !== '' ? Number(form.pricing.amount) : 0,
           discount: form.pricing.discount,
           popular: !!form.pricing.popular,
           trialDays: Number(form.pricing.trialDays || 0)

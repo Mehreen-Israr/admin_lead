@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchContacts, archiveContact } from '../services/api';
+import { fetchContacts, archiveContact, sendReplyEmail } from '../services/api';
 import './ContactsPage.css';
 
 const ContactsPage = () => {
@@ -10,6 +10,7 @@ const ContactsPage = () => {
   const [activeTab, setActiveTab] = useState('active'); // 'active' or 'archived'
   const [showReplyModal, setShowReplyModal] = useState(false);
   const [selectedContact, setSelectedContact] = useState(null);
+  const [sendingEmail, setSendingEmail] = useState(false);
 
   useEffect(() => {
     loadContacts();
@@ -260,6 +261,35 @@ const ContactsPage = () => {
               <div className="modal-actions">
                 <button 
                   className="btn-primary"
+                  disabled={sendingEmail}
+                  onClick={async () => {
+                    try {
+                      setSendingEmail(true);
+                      const adminEmail = 'admin@leadmagnet.com'; // You can make this configurable
+                      await sendReplyEmail(
+                        selectedContact._id,
+                        selectedContact.replySubject,
+                        selectedContact.replyBody,
+                        adminEmail
+                      );
+                      alert('Email sent successfully!');
+                      setShowReplyModal(false);
+                      // Refresh contacts to update status
+                      loadContacts();
+                    } catch (error) {
+                      console.error('Error sending email:', error);
+                      alert('Failed to send email: ' + error.message);
+                    } finally {
+                      setSendingEmail(false);
+                    }
+                  }}
+                >
+                  <i className={`fas ${sendingEmail ? 'fa-spinner fa-spin' : 'fa-paper-plane'}`}></i>
+                  {sendingEmail ? 'Sending...' : 'Send Email'}
+                </button>
+                
+                <button 
+                  className="btn-secondary"
                   onClick={() => {
                     try {
                       const mailtoLink = `mailto:${selectedContact.email}?subject=${encodeURIComponent(selectedContact.replySubject)}&body=${encodeURIComponent(selectedContact.replyBody)}`;

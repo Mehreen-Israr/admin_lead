@@ -6,6 +6,7 @@ const adminAuth = require('../middleware/adminAuth');
 const Package = require('../models/Package');
 const Notification = require('../models/Notification');
 const NotificationService = require('../services/notificationService');
+const EmailService = require('../services/emailService');
 const json2csv = require('json2csv').parse;
 
 // Get all users
@@ -377,6 +378,60 @@ router.patch('/contacts/:id/archive', adminAuth, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Server error while archiving contact'
+    });
+  }
+});
+
+// Send reply email to contact
+router.post('/contacts/:id/reply', adminAuth, async (req, res) => {
+  try {
+    const { subject, message, adminEmail } = req.body;
+    const contact = await Contact.findById(req.params.id);
+    
+    if (!contact) {
+      return res.status(404).json({ success: false, message: 'Contact not found' });
+    }
+
+    // Send the reply email
+    const emailResult = await EmailService.sendReplyEmail(
+      contact.email,
+      contact.name,
+      subject,
+      message,
+      adminEmail
+    );
+
+    // Update contact status to 'contacted'
+    await Contact.findByIdAndUpdate(req.params.id, { 
+      status: 'contacted',
+      lastContacted: new Date()
+    });
+
+    // Create notification for successful reply
+    await NotificationService.createNotification({
+      type: 'email_sent',
+      title: 'Reply Email Sent',
+      message: `Reply sent to ${contact.name} (${contact.email})`,
+      priority: 'low',
+      relatedId: contact._id,
+      relatedModel: 'Contact',
+      metadata: { 
+        contactId: contact._id, 
+        contactEmail: contact.email,
+        emailSubject: subject
+      }
+    });
+
+    res.json({ 
+      success: true, 
+      message: 'Reply email sent successfully',
+      data: { messageId: emailResult.messageId }
+    });
+  } catch (error) {
+    console.error('Error sending reply email:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Server error while sending reply email: ' + error.message 
     });
   }
 });
