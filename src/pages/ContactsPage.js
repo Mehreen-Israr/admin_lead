@@ -330,7 +330,7 @@ const ContactsPage = () => {
                       let errorMessage;
                       
                       if (error.message.includes('credentials') || error.message.includes('not configured')) {
-                        errorMessage = 'Email service not configured. Please use "Open Email Client" or "Copy All" to send emails manually.';
+                        errorMessage = 'Email service not configured. Please set EMAIL_USER and EMAIL_PASS environment variables in Render, then redeploy. Use "Open Email Client" or "Copy All" to send emails manually for now.';
                       } else if (error.message.includes('timeout')) {
                         errorMessage = 'Email sending timed out. Please try "Open Email Client" or "Copy All" instead.';
                       } else {

@@ -10,7 +10,7 @@ class EmailService {
   }
 
   loadConfig() {
-    return {
+    const config = {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
       service: process.env.EMAIL_SERVICE || 'gmail',
@@ -20,6 +20,15 @@ class EmailService {
       from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
       replyTo: process.env.EMAIL_REPLY_TO || process.env.EMAIL_USER
     };
+    
+    console.log('Email service config loaded:', {
+      user: config.user ? '***' + config.user.slice(-4) : 'not set',
+      pass: config.pass ? '***' + config.pass.slice(-4) : 'not set',
+      service: config.service,
+      from: config.from
+    });
+    
+    return config;
   }
 
   initializeTransporter() {
@@ -27,6 +36,7 @@ class EmailService {
       // Check if email credentials are provided
       if (!this.config.user || !this.config.pass) {
         console.warn('Email service: No credentials provided. Email functionality disabled.');
+        console.warn('Please set EMAIL_USER and EMAIL_PASS environment variables in Render.');
         return;
       }
 
@@ -36,6 +46,7 @@ class EmailService {
           this.config.user.includes('your-email') ||
           this.config.pass.includes('your-')) {
         console.warn('Email service: Placeholder credentials detected. Email functionality disabled.');
+        console.warn('Please set real email credentials in Render environment variables.');
         return;
       }
 
