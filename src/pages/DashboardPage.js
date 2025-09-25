@@ -77,8 +77,15 @@ const DashboardPage = () => {
 
   const handleExportData = async (type) => {
     try {
-      await exportData(type);
-      alert(`${type.charAt(0).toUpperCase() + type.slice(1)} data exported successfully!`);
+      if (type === 'all') {
+        // Export both users and contacts
+        await exportData('users');
+        await exportData('contacts');
+        alert('All data (users and contacts) exported successfully!');
+      } else {
+        await exportData(type);
+        alert(`${type.charAt(0).toUpperCase() + type.slice(1)} data exported successfully!`);
+      }
     } catch (error) {
       alert(`Error exporting data: ${error.message}`);
     }
@@ -180,10 +187,6 @@ const DashboardPage = () => {
             >
               <i className="fas fa-sync-alt"></i>
               <span>{refreshing ? 'Refreshing...' : 'Refresh Data'}</span>
-            </button>
-            <button className="export-btn">
-              <i className="fas fa-download"></i>
-              <span>Export</span>
             </button>
           </div>
         </div>

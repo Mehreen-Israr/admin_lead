@@ -388,3 +388,24 @@ export const deleteUser = async (userId) => {
     throw error;
   }
 };
+
+// Archive/Unarchive contact
+export const archiveContact = async (contactId, isArchived) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/admin/contacts/${contactId}/archive`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ isArchived })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to archive contact');
+    }
+    
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error('Error archiving contact:', error);
+    throw error;
+  }
+};

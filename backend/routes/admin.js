@@ -343,6 +343,37 @@ router.patch('/contacts/:id/status', adminAuth, async (req, res) => {
   }
 });
 
+// Archive/Unarchive contact
+router.patch('/contacts/:id/archive', adminAuth, async (req, res) => {
+  try {
+    const { isArchived } = req.body;
+    
+    const contact = await Contact.findByIdAndUpdate(
+      req.params.id,
+      { isArchived },
+      { new: true }
+    );
+    
+    if (!contact) {
+      return res.status(404).json({
+        success: false,
+        message: 'Contact not found'
+      });
+    }
+    
+    res.json({
+      success: true,
+      data: contact
+    });
+  } catch (error) {
+    console.error('Error archiving contact:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while archiving contact'
+    });
+  }
+});
+
 // Get all notifications
 router.get('/notifications', adminAuth, async (req, res) => {
   try {

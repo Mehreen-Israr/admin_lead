@@ -87,15 +87,28 @@ const UsersPage = () => {
       </div>
 
       <div className="page-controls">
-        <div className="search-bar">
+        <div className="search-container">
+          <div className="search-icon">
+            <i className="fas fa-search"></i>
+          </div>
           <input
             type="text"
+            className="search-input"
             placeholder="Search users by name or email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+          {searchTerm && (
+            <button 
+              className="clear-search-btn"
+              onClick={() => setSearchTerm('')}
+            >
+              <i className="fas fa-times"></i>
+            </button>
+          )}
         </div>
         <button className="refresh-btn" onClick={loadUsers}>
+          <i className="fas fa-sync-alt"></i>
           Refresh
         </button>
       </div>

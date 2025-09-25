@@ -48,7 +48,7 @@
   align-items: center;
 }
 
-.refresh-btn, .export-btn {
+.refresh-btn {
   display: flex;
   align-items: center;
   gap: var(--space-xs);
@@ -63,7 +63,7 @@
   backdrop-filter: blur(10px);
 }
 
-.refresh-btn:hover, .export-btn:hover {
+.refresh-btn:hover {
   background: var(--primary-50);
   border-color: var(--primary-200);
   color: var(--primary-600);
