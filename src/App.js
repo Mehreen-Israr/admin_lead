@@ -9,6 +9,7 @@ import DashboardPage from './pages/DashboardPage';
 import UsersPage from './pages/UsersPage';
 import ContactsPage from './pages/ContactsPage';
 import SubscriptionsPage from './pages/SubscriptionsPage';
+import EmailTestPage from './pages/EmailTestPage';
 import Login from './pages/Login';
 
 // Create a separate component for the main app content
@@ -50,13 +51,14 @@ function AppContent() {
       <div className="main-content">
         <Header onLogout={logout} sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
         <div className="content-area">
-          <Routes>
-            <Route path="/" element={<DashboardPage />} />
-            <Route path="/users" element={<UsersPage />} />
-            <Route path="/contacts" element={<ContactsPage />} />
-            <Route path="/subscriptions" element={<SubscriptionsPage />} />
-            <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
+                 <Routes>
+                   <Route path="/" element={<DashboardPage />} />
+                   <Route path="/users" element={<UsersPage />} />
+                   <Route path="/contacts" element={<ContactsPage />} />
+                   <Route path="/subscriptions" element={<SubscriptionsPage />} />
+                   <Route path="/email-test" element={<EmailTestPage />} />
+                   <Route path="*" element={<Navigate to="/" />} />
+                 </Routes>
         </div>
       </div>
     </div>

@@ -826,4 +826,91 @@ function getActivityColor(type) {
   return colorMap[type] || 'primary';
 }
 
+// Test email service
+router.get('/email/test', adminAuth, async (req, res) => {
+  try {
+    if (!EmailService) {
+      return res.status(503).json({
+        success: false,
+        message: 'Email service not available'
+      });
+    }
+
+    const status = EmailService.getStatus();
+    
+    if (!status.configured) {
+      return res.status(503).json({
+        success: false,
+        message: 'Email service not configured',
+        status: status
+      });
+    }
+
+    // Test connection
+    const connectionTest = await EmailService.testConnection();
+    
+    if (!connectionTest) {
+      return res.status(503).json({
+        success: false,
+        message: 'Email connection test failed',
+        status: status
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Email service is working correctly',
+      status: status
+    });
+  } catch (error) {
+    console.error('Error testing email service:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error testing email service: ' + error.message
+    });
+  }
+});
+
+// Send test email
+router.post('/email/test', adminAuth, async (req, res) => {
+  try {
+    const { to } = req.body;
+    
+    if (!EmailService) {
+      return res.status(503).json({
+        success: false,
+        message: 'Email service not configured'
+      });
+    }
+
+    const testEmail = await EmailService.sendEmail({
+      to: to || process.env.EMAIL_USER,
+      subject: 'Lead Magnet - Email Service Test',
+      text: 'This is a test email from Lead Magnet admin panel. If you receive this, the email service is working correctly.',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #333;">Lead Magnet - Email Service Test</h2>
+          <p>This is a test email from Lead Magnet admin panel.</p>
+          <p>If you receive this, the email service is working correctly.</p>
+          <p style="color: #666; font-size: 14px; margin-top: 30px;">
+            Sent at: ${new Date().toLocaleString()}
+          </p>
+        </div>
+      `
+    });
+
+    res.json({
+      success: true,
+      message: 'Test email sent successfully',
+      data: testEmail
+    });
+  } catch (error) {
+    console.error('Error sending test email:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error sending test email: ' + error.message
+    });
+  }
+});
+
 module.exports = router;
