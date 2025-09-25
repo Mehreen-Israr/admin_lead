@@ -331,10 +331,12 @@ const ContactsPage = () => {
                       
                       if (error.message.includes('credentials') || error.message.includes('not configured')) {
                         errorMessage = 'Email service not configured. Please set EMAIL_USER and EMAIL_PASS environment variables in Render, then redeploy. Use "Open Email Client" or "Copy All" to send emails manually for now.';
-                      } else if (error.message.includes('timeout')) {
-                        errorMessage = 'Email sending timed out. Please try "Open Email Client" or "Copy All" instead.';
+                      } else if (error.message.includes('timeout') || error.message.includes('Connection timeout')) {
+                        errorMessage = 'Email service is experiencing connection issues. This is common on cloud platforms. Please use "Open Email Client" or "Copy All" to send emails manually. The email content is ready to copy.';
+                      } else if (error.message.includes('All email services failed')) {
+                        errorMessage = 'Email services are currently unavailable due to network restrictions. Please use "Open Email Client" or "Copy All" to send emails manually. The email content is ready to copy.';
                       } else {
-                        errorMessage = 'Failed to send email: ' + error.message + '\n\nPlease use "Open Email Client" or "Copy All" to send emails manually.';
+                        errorMessage = 'Email sending failed: ' + error.message + '\n\nPlease use "Open Email Client" or "Copy All" to send emails manually.';
                       }
                       
                       alert(errorMessage);

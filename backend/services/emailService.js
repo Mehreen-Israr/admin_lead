@@ -1,5 +1,6 @@
 const nodemailer = require('nodemailer');
 const { simpleEmailService } = require('./simpleEmailService');
+const { reliableEmailService } = require('./reliableEmailService');
 
 // Bulletproof email service that works immediately
 class EmailService {
@@ -193,8 +194,15 @@ class EmailService {
       try {
         return await simpleEmailService.sendReplyEmail(contactEmail, contactName, subject, message, adminEmail);
       } catch (fallbackError) {
-        console.error('Simple email service also failed:', fallbackError.message);
-        throw new Error('All email services failed. Please use "Open Email Client" or "Copy All" to send emails manually.');
+        console.error('Simple email service also failed, trying reliable email service:', fallbackError.message);
+        
+        // Final fallback to reliable email service
+        try {
+          return await reliableEmailService.sendReplyEmail(contactEmail, contactName, subject, message, adminEmail);
+        } catch (reliableError) {
+          console.error('Reliable email service also failed:', reliableError.message);
+          throw new Error('All email services failed. Please use "Open Email Client" or "Copy All" to send emails manually.');
+        }
       }
     }
   }
