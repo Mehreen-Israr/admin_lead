@@ -473,24 +473,42 @@
 
 @media (max-width: 768px) {
   .header-container {
-    padding: 0 var(--space-md);
+    padding: 0 var(--space-sm);
     justify-content: space-between;
   }
 
   .header-left {
-    gap: var(--space-sm); /* tighter spacing */
+    gap: var(--space-xs);
   }
 
   .header-breadcrumb {
-    font-size: 0.8rem;
-    max-width: 150px; 
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap; /* truncate long breadcrumbs */
+    display: none; /* hide breadcrumb on mobile */
   }
 
   .header-actions {
-    display: none; /* hide extra buttons */
+    display: none;
+  }
+  
+  .mobile-menu-btn {
+    margin-right: var(--space-xs);
+  }
+  
+  .user-menu-btn {
+    padding: var(--space-xs) var(--space-sm);
+  }
+  
+  .user-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
+  
+  .user-name {
+    font-size: 0.8rem;
+  }
+  
+  .user-role {
+    font-size: 0.7rem;
   }
 }
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import './App.css';
@@ -20,6 +20,21 @@ function AppContent() {
     setSidebarOpen(false);
     document.body.classList.remove('sidebar-open');
   };
+
+  // Close sidebar when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (sidebarOpen && !e.target.closest('.sidebar') && !e.target.closest('.mobile-menu-btn')) {
+        closeSidebar();
+      }
+    };
+    
+    if (sidebarOpen) {
+      document.addEventListener('click', handleClickOutside);
+    }
+    
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [sidebarOpen]);
 
   if (loading) {
     return <div className="loading-screen">Loading...</div>;

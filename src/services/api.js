@@ -368,3 +368,23 @@ export const getUserById = async (userId) => {
     throw error;
   }
 };
+
+// Delete user
+export const deleteUser = async (userId) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/admin/users/${userId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to delete user');
+    }
+    
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    throw error;
+  }
+};

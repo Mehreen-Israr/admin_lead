@@ -6,7 +6,6 @@ const adminAuth = require('../middleware/adminAuth');
 const Package = require('../models/Package');
 const Notification = require('../models/Notification');
 const NotificationService = require('../services/notificationService');
-const bcrypt = require('bcryptjs');
 const json2csv = require('json2csv').parse;
 
 // Get all users
@@ -506,15 +505,11 @@ router.post('/users', adminAuth, async (req, res) => {
       });
     }
 
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    // Create user
+    // Create user (password will be hashed automatically by the User model pre-save hook)
     const user = new User({
       name,
       email,
-      password: hashedPassword,
+      password, // Pass plain password, let the model handle hashing
       role,
       isActive: true
     });

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchUsers, getUserById } from '../services/api';
+import { fetchUsers, getUserById, deleteUser } from '../services/api';
 import './UsersPage.css';
 
 const UsersPage = () => {
@@ -10,6 +10,7 @@ const UsersPage = () => {
   const [showViewModal, setShowViewModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [loadingUser, setLoadingUser] = useState(false);
+  const [deletingUserId, setDeletingUserId] = useState(null);
 
   useEffect(() => {
     loadUsers();
@@ -40,6 +41,27 @@ const UsersPage = () => {
       alert('Failed to load user details. Please try again.');
     } finally {
       setLoadingUser(false);
+    }
+  };
+
+  const handleDeleteUser = async (userId, userName) => {
+    if (!window.confirm(`Are you sure you want to delete user "${userName}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      setDeletingUserId(userId);
+      await deleteUser(userId);
+      
+      // Remove user from local state
+      setUsers(users.filter(user => user._id !== userId));
+      
+      alert('User deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      alert('Failed to delete user. Please try again.');
+    } finally {
+      setDeletingUserId(null);
     }
   };
 
@@ -130,6 +152,13 @@ const UsersPage = () => {
                         disabled={loadingUser}
                       >
                         {loadingUser ? 'Loading...' : 'View'}
+                      </button>
+                      <button 
+                        className="btn-delete" 
+                        onClick={() => handleDeleteUser(user._id, user.name)}
+                        disabled={deletingUserId === user._id}
+                      >
+                        {deletingUserId === user._id ? 'Deleting...' : 'Delete'}
                       </button>
                     </div>
                   </td>

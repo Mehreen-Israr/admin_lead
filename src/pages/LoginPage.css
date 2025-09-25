@@ -29,6 +29,10 @@
   font-weight: 700;
   margin-bottom: 1rem;
   letter-spacing: 2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
 
 .logo-lead {
