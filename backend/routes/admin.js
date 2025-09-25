@@ -4,6 +4,7 @@ const User = require('../models/User');
 const Contact = require('../models/Contact');
 const adminAuth = require('../middleware/adminAuth');
 const Package = require('../models/Package');
+const Booking = require('../models/Booking');
 const Notification = require('../models/Notification');
 const NotificationService = require('../services/notificationService');
 let EmailService;
@@ -1044,6 +1045,248 @@ router.post('/email/force-reinit', adminAuth, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error force reinitializing email service: ' + error.message
+    });
+  }
+});
+
+// ==================== BOOKING ROUTES ====================
+
+// Get all bookings
+router.get('/bookings', adminAuth, async (req, res) => {
+  try {
+    const { page = 1, limit = 20, status, search } = req.query;
+    const skip = (page - 1) * limit;
+    
+    // Build filter object
+    const filter = {};
+    if (status) filter.status = status;
+    if (search) {
+      filter.$or = [
+        { customerName: { $regex: search, $options: 'i' } },
+        { customerEmail: { $regex: search, $options: 'i' } },
+        { serviceType: { $regex: search, $options: 'i' } }
+      ];
+    }
+    
+    const bookings = await Booking.find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+    
+    const total = await Booking.countDocuments(filter);
+    
+    res.json({
+      success: true,
+      count: bookings.length,
+      total,
+      page: parseInt(page),
+      pages: Math.ceil(total / limit),
+      data: bookings
+    });
+  } catch (error) {
+    console.error('Error fetching bookings:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching bookings'
+    });
+  }
+});
+
+// Get booking by ID
+router.get('/bookings/:id', adminAuth, async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.id);
+    
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: 'Booking not found'
+      });
+    }
+    
+    res.json({
+      success: true,
+      data: booking
+    });
+  } catch (error) {
+    console.error('Error fetching booking:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching booking'
+    });
+  }
+});
+
+// Update booking status
+router.patch('/bookings/:id/status', adminAuth, async (req, res) => {
+  try {
+    const { status, adminNotes, cancellationReason } = req.body;
+    
+    const updateData = { status };
+    
+    if (status === 'confirmed') {
+      updateData.confirmedAt = new Date();
+    } else if (status === 'completed') {
+      updateData.completedAt = new Date();
+    } else if (status === 'cancelled') {
+      updateData.cancelledAt = new Date();
+      if (cancellationReason) {
+        updateData.cancellationReason = cancellationReason;
+      }
+    }
+    
+    if (adminNotes) {
+      updateData.adminNotes = adminNotes;
+    }
+    
+    const booking = await Booking.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true }
+    );
+    
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: 'Booking not found'
+      });
+    }
+    
+    // Create notification
+    await NotificationService.createNotification({
+      type: 'booking_updated',
+      title: 'Booking Status Updated',
+      message: `Booking for ${booking.customerName} has been ${status}`,
+      priority: 'medium',
+      relatedId: booking._id,
+      relatedModel: 'Booking',
+      metadata: {
+        bookingId: booking._id,
+        customerName: booking.customerName,
+        status: status
+      }
+    });
+    
+    res.json({
+      success: true,
+      message: 'Booking status updated successfully',
+      data: booking
+    });
+  } catch (error) {
+    console.error('Error updating booking status:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while updating booking status'
+    });
+  }
+});
+
+// Update booking details
+router.put('/bookings/:id', adminAuth, async (req, res) => {
+  try {
+    const updateData = req.body;
+    
+    const booking = await Booking.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true, runValidators: true }
+    );
+    
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: 'Booking not found'
+      });
+    }
+    
+    res.json({
+      success: true,
+      message: 'Booking updated successfully',
+      data: booking
+    });
+  } catch (error) {
+    console.error('Error updating booking:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while updating booking'
+    });
+  }
+});
+
+// Delete booking
+router.delete('/bookings/:id', adminAuth, async (req, res) => {
+  try {
+    const booking = await Booking.findByIdAndDelete(req.params.id);
+    
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: 'Booking not found'
+      });
+    }
+    
+    res.json({
+      success: true,
+      message: 'Booking deleted successfully'
+    });
+  } catch (error) {
+    console.error('Error deleting booking:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while deleting booking'
+    });
+  }
+});
+
+// Get booking statistics
+router.get('/bookings-stats', adminAuth, async (req, res) => {
+  try {
+    const totalBookings = await Booking.countDocuments();
+    const pendingBookings = await Booking.countDocuments({ status: 'pending' });
+    const confirmedBookings = await Booking.countDocuments({ status: 'confirmed' });
+    const completedBookings = await Booking.countDocuments({ status: 'completed' });
+    const cancelledBookings = await Booking.countDocuments({ status: 'cancelled' });
+    
+    // Get bookings by month for the last 6 months
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+    
+    const monthlyBookings = await Booking.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: sixMonthsAgo }
+        }
+      },
+      {
+        $group: {
+          _id: {
+            year: { $year: '$createdAt' },
+            month: { $month: '$createdAt' }
+          },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { '_id.year': 1, '_id.month': 1 }
+      }
+    ]);
+    
+    res.json({
+      success: true,
+      data: {
+        total: totalBookings,
+        pending: pendingBookings,
+        confirmed: confirmedBookings,
+        completed: completedBookings,
+        cancelled: cancelledBookings,
+        monthly: monthlyBookings
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching booking stats:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching booking statistics'
     });
   }
 });

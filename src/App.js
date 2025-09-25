@@ -9,6 +9,7 @@ import Header from './components/Header';
 import DashboardPage from './pages/DashboardPage';
 import UsersPage from './pages/UsersPage';
 import ContactsPage from './pages/ContactsPage';
+import BookingsPage from './pages/BookingsPage';
 import SubscriptionsPage from './pages/SubscriptionsPage';
 import Login from './pages/Login';
 
@@ -51,13 +52,14 @@ function AppContent() {
       <div className="main-content">
         <Header onLogout={logout} sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
         <div className="content-area">
-                 <Routes>
-                   <Route path="/" element={<DashboardPage />} />
-                   <Route path="/users" element={<UsersPage />} />
-                   <Route path="/contacts" element={<ContactsPage />} />
-                   <Route path="/subscriptions" element={<SubscriptionsPage />} />
-                   <Route path="*" element={<Navigate to="/" />} />
-                 </Routes>
+                <Routes>
+                  <Route path="/" element={<DashboardPage />} />
+                  <Route path="/users" element={<UsersPage />} />
+                  <Route path="/contacts" element={<ContactsPage />} />
+                  <Route path="/bookings" element={<BookingsPage />} />
+                  <Route path="/subscriptions" element={<SubscriptionsPage />} />
+                  <Route path="*" element={<Navigate to="/" />} />
+                </Routes>
         </div>
       </div>
     </div>

@@ -460,3 +460,134 @@ export const sendReplyEmail = async (contactId, subject, message, adminEmail) =>
     throw error;
   }
 };
+
+// ==================== BOOKING API FUNCTIONS ====================
+
+export const getBookings = async (page = 1, limit = 20, status = '', search = '') => {
+  try {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString()
+    });
+    
+    if (status) params.append('status', status);
+    if (search) params.append('search', search);
+
+    const response = await fetch(`${API_BASE_URL}/api/admin/bookings?${params}`, {
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch bookings');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching bookings:', error);
+    throw error;
+  }
+};
+
+export const getBookingById = async (id) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/admin/bookings/${id}`, {
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch booking');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching booking:', error);
+    throw error;
+  }
+};
+
+export const updateBookingStatus = async (id, status, adminNotes = '', cancellationReason = '') => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/admin/bookings/${id}/status`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getAuthToken()}`
+      },
+      body: JSON.stringify({ status, adminNotes, cancellationReason })
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update booking status');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating booking status:', error);
+    throw error;
+  }
+};
+
+export const updateBooking = async (id, bookingData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/admin/bookings/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getAuthToken()}`
+      },
+      body: JSON.stringify(bookingData)
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update booking');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating booking:', error);
+    throw error;
+  }
+};
+
+export const deleteBooking = async (id) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/admin/bookings/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete booking');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error deleting booking:', error);
+    throw error;
+  }
+};
+
+export const getBookingStats = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/admin/bookings-stats`, {
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch booking statistics');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching booking statistics:', error);
+    throw error;
+  }
+};
