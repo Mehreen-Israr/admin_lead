@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const { simpleEmailService } = require('./simpleEmailService');
 
 // Bulletproof email service that works immediately
 class EmailService {
@@ -42,21 +43,26 @@ class EmailService {
       let transporterConfig;
       
       if (this.config.service.toLowerCase() === 'gmail') {
-        // Gmail-specific configuration
+        // Gmail-specific configuration optimized for Render
         transporterConfig = {
           host: 'smtp.gmail.com',
-          port: 587,
-          secure: false, // true for 465, false for other ports
+          port: 465, // Use port 465 for SSL
+          secure: true, // Use SSL
           auth: {
             user: this.config.user,
             pass: this.config.pass
           },
-          connectionTimeout: 60000,
-          greetingTimeout: 30000,
-          socketTimeout: 60000,
+          connectionTimeout: 30000, // Reduced timeout for Render
+          greetingTimeout: 15000,   // Reduced timeout for Render
+          socketTimeout: 30000,     // Reduced timeout for Render
           tls: {
-            rejectUnauthorized: false
-          }
+            rejectUnauthorized: false,
+            ciphers: 'SSLv3'
+          },
+          // Additional settings for Render
+          pool: false,
+          maxConnections: 1,
+          maxMessages: 1
         };
       } else {
         // Generic configuration
@@ -111,7 +117,7 @@ class EmailService {
       html: html
     };
 
-    // Retry mechanism for connection issues
+    // Retry mechanism with fallback configuration
     let lastError;
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {
@@ -127,10 +133,39 @@ class EmailService {
         console.error(`Email attempt ${attempt} failed:`, error.message);
         lastError = error;
         
-        // If it's a connection timeout, wait before retry
+        // If it's a connection timeout, try different configuration
         if (error.code === 'ETIMEDOUT' && attempt < 3) {
-          console.log(`Waiting 5 seconds before retry ${attempt + 1}...`);
-          await new Promise(resolve => setTimeout(resolve, 5000));
+          console.log(`Connection timeout on attempt ${attempt}, trying alternative configuration...`);
+          
+          // Try alternative Gmail configuration
+          if (this.config.service.toLowerCase() === 'gmail') {
+            try {
+              console.log('Trying alternative Gmail configuration...');
+              const altTransporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                  user: this.config.user,
+                  pass: this.config.pass
+                },
+                connectionTimeout: 20000,
+                greetingTimeout: 10000,
+                socketTimeout: 20000
+              });
+              
+              const result = await altTransporter.sendMail(mailOptions);
+              console.log('Email sent successfully with alternative config:', result.messageId);
+              return {
+                success: true,
+                messageId: result.messageId,
+                response: result.response
+              };
+            } catch (altError) {
+              console.error('Alternative configuration also failed:', altError.message);
+            }
+          }
+          
+          console.log(`Waiting 3 seconds before retry ${attempt + 1}...`);
+          await new Promise(resolve => setTimeout(resolve, 3000));
           
           // Recreate transporter for retry
           this.initialize();
@@ -148,6 +183,23 @@ class EmailService {
   }
 
   async sendReplyEmail(contactEmail, contactName, subject, message, adminEmail = null) {
+    // Try main email service first
+    try {
+      return await this.sendReplyEmailMain(contactEmail, contactName, subject, message, adminEmail);
+    } catch (error) {
+      console.error('Main email service failed, trying simple email service:', error.message);
+      
+      // Fallback to simple email service
+      try {
+        return await simpleEmailService.sendReplyEmail(contactEmail, contactName, subject, message, adminEmail);
+      } catch (fallbackError) {
+        console.error('Simple email service also failed:', fallbackError.message);
+        throw new Error('All email services failed. Please use "Open Email Client" or "Copy All" to send emails manually.');
+      }
+    }
+  }
+
+  async sendReplyEmailMain(contactEmail, contactName, subject, message, adminEmail = null) {
     const fromEmail = adminEmail || this.config.from;
     
     const htmlTemplate = `
