@@ -43,6 +43,55 @@ const ContactsPage = () => {
     setShowReplyModal(true);
   };
 
+  // Utility function to open email client with better error handling
+  const openEmailClient = (email, subject, body) => {
+    try {
+      const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      console.log('Attempting to open email client with link:', mailtoLink);
+      
+      // Method 1: Try creating and clicking a link (most reliable)
+      const link = document.createElement('a');
+      link.href = mailtoLink;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      
+      // Use requestAnimationFrame for better timing
+      requestAnimationFrame(() => {
+        try {
+          link.click();
+          console.log('Email client link clicked successfully');
+          // Clean up after a short delay
+          setTimeout(() => {
+            if (document.body.contains(link)) {
+              document.body.removeChild(link);
+            }
+          }, 100);
+        } catch (clickError) {
+          console.error('Error clicking mailto link:', clickError);
+          // Method 2: Try window.open as fallback
+          try {
+            console.log('Trying window.open fallback...');
+            window.open(mailtoLink, '_self');
+          } catch (openError) {
+            console.error('Error with window.open fallback:', openError);
+            // Method 3: Try window.location as last resort
+            try {
+              console.log('Trying window.location fallback...');
+              window.location.href = mailtoLink;
+            } catch (locationError) {
+              console.error('All mailto methods failed:', locationError);
+              throw new Error('Unable to open email client. Please copy the email content and send manually.');
+            }
+          }
+        }
+      });
+      
+    } catch (error) {
+      console.error('Error opening email client:', error);
+      throw error;
+    }
+  };
+
   const handleArchive = async (contactId, isArchived) => {
     try {
       await archiveContact(contactId, isArchived);
@@ -295,25 +344,18 @@ const ContactsPage = () => {
                   className="btn-secondary"
                   onClick={() => {
                     try {
-                      const mailtoLink = `mailto:${selectedContact.email}?subject=${encodeURIComponent(selectedContact.replySubject)}&body=${encodeURIComponent(selectedContact.replyBody)}`;
-                      
-                      // Try multiple methods to open email client
-                      try {
-                        // Method 1: Direct window.location
-                        window.location.href = mailtoLink;
-                      } catch (error) {
-                        // Method 2: Create and click link
-                        const link = document.createElement('a');
-                        link.href = mailtoLink;
-                        link.target = '_blank';
-                        link.style.display = 'none';
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                      }
+                      openEmailClient(
+                        selectedContact.email,
+                        selectedContact.replySubject,
+                        selectedContact.replyBody
+                      );
+                      // Show success message after a short delay
+                      setTimeout(() => {
+                        alert('Email client should open shortly. If it doesn\'t open, please check your browser settings or use "Copy All" to copy the email content.');
+                      }, 500);
                     } catch (error) {
                       console.error('Error opening email client:', error);
-                      alert('Unable to open email client. Please copy the email address and send manually.');
+                      alert('Unable to open email client. Please copy the email content and send manually.');
                     }
                   }}
                 >
@@ -335,9 +377,16 @@ const ContactsPage = () => {
                 <button 
                   className="btn-secondary"
                   onClick={() => {
-                    const emailContent = `To: ${selectedContact.email}\nSubject: ${selectedContact.replySubject}\n\n${selectedContact.replyBody}`;
-                    navigator.clipboard.writeText(emailContent);
-                    alert('Email content copied to clipboard!');
+                    try {
+                      const emailContent = `To: ${selectedContact.email}\nSubject: ${selectedContact.replySubject}\n\n${selectedContact.replyBody}`;
+                      navigator.clipboard.writeText(emailContent);
+                      alert('Email content copied to clipboard! You can now paste it into any email client.');
+                    } catch (error) {
+                      console.error('Error copying to clipboard:', error);
+                      // Fallback: show the content in a prompt for manual copying
+                      const emailContent = `To: ${selectedContact.email}\nSubject: ${selectedContact.replySubject}\n\n${selectedContact.replyBody}`;
+                      prompt('Copy this email content:', emailContent);
+                    }
                   }}
                 >
                   <i className="fas fa-clipboard"></i>
