@@ -278,7 +278,10 @@ const ContactsPage = () => {
                       loadContacts();
                     } catch (error) {
                       console.error('Error sending email:', error);
-                      alert('Failed to send email: ' + error.message);
+                      const errorMessage = error.message.includes('credentials') || error.message.includes('timeout') 
+                        ? 'Email service not configured. Please use "Open Email Client" instead.'
+                        : 'Failed to send email: ' + error.message;
+                      alert(errorMessage);
                     } finally {
                       setSendingEmail(false);
                     }

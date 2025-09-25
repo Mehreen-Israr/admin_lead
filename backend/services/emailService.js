@@ -12,14 +12,26 @@ const createTransporter = () => {
     throw new Error('Email service not configured. Please install nodemailer and configure email settings.');
   }
   
+  // Check if email credentials are configured
+  const emailUser = process.env.EMAIL_USER;
+  const emailPass = process.env.EMAIL_PASS;
+  
+  if (!emailUser || !emailPass || emailUser === 'your-email@gmail.com' || emailPass === 'your-app-password') {
+    throw new Error('Email credentials not configured. Please set EMAIL_USER and EMAIL_PASS environment variables.');
+  }
+  
   // For development, you can use Gmail SMTP or any other email service
   // You'll need to set up environment variables for production
   return nodemailer.createTransport({
     service: 'gmail', // You can change this to your preferred email service
     auth: {
-      user: process.env.EMAIL_USER || 'your-email@gmail.com',
-      pass: process.env.EMAIL_PASS || 'your-app-password' // Use app password for Gmail
-    }
+      user: emailUser,
+      pass: emailPass
+    },
+    // Add timeout and connection settings
+    connectionTimeout: 10000, // 10 seconds
+    greetingTimeout: 10000,   // 10 seconds
+    socketTimeout: 10000      // 10 seconds
   });
 };
 
@@ -49,12 +61,28 @@ const sendReplyEmail = async (contactEmail, contactName, subject, message, admin
       text: message // Plain text version
     };
 
-    const result = await transporter.sendMail(mailOptions);
+    // Add timeout to the sendMail operation
+    const sendPromise = transporter.sendMail(mailOptions);
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Email sending timeout')), 15000)
+    );
+    
+    const result = await Promise.race([sendPromise, timeoutPromise]);
     console.log('Email sent successfully:', result.messageId);
     return { success: true, messageId: result.messageId };
   } catch (error) {
     console.error('Error sending email:', error);
-    throw new Error('Failed to send email: ' + error.message);
+    
+    // Provide more specific error messages
+    if (error.message.includes('timeout')) {
+      throw new Error('Email sending timed out. Please check your email configuration.');
+    } else if (error.message.includes('credentials')) {
+      throw new Error('Email credentials are invalid. Please check your email settings.');
+    } else if (error.message.includes('Connection timeout')) {
+      throw new Error('Cannot connect to email server. Please check your internet connection and email settings.');
+    } else {
+      throw new Error('Failed to send email: ' + error.message);
+    }
   }
 };
 
