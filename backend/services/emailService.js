@@ -14,7 +14,7 @@ const createTransporter = () => {
   
   // For development, you can use Gmail SMTP or any other email service
   // You'll need to set up environment variables for production
-  return nodemailer.createTransporter({
+  return nodemailer.createTransport({
     service: 'gmail', // You can change this to your preferred email service
     auth: {
       user: process.env.EMAIL_USER || 'your-email@gmail.com',
