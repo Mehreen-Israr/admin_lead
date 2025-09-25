@@ -78,9 +78,9 @@ const DashboardPage = () => {
   const handleExportData = async (type) => {
     try {
       if (type === 'all') {
-        // Use the backend's 'all' endpoint which returns JSON with both users and contacts
-        await exportData('all', 'json');
-        alert('All data (users and contacts) exported successfully!');
+        // Use the backend's 'all' endpoint which now returns Excel with both users and contacts
+        await exportData('all', 'xlsx');
+        alert('All data (users and contacts) exported successfully as Excel file!');
       } else {
         await exportData(type);
         alert(`${type.charAt(0).toUpperCase() + type.slice(1)} data exported successfully!`);

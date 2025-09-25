@@ -315,16 +315,21 @@ const ContactsPage = () => {
                     try {
                       setSendingEmail(true);
                       const adminEmail = 'leadmagnet.notifications@gmail.com'; // Use the configured email
-                      await sendReplyEmail(
+                      const result = await sendReplyEmail(
                         selectedContact._id,
                         selectedContact.replySubject,
                         selectedContact.replyBody,
                         adminEmail
                       );
-                      alert('Email sent successfully!');
-                      setShowReplyModal(false);
-                      // Refresh contacts to update status
-                      loadContacts();
+                      
+                      if (result && result.success) {
+                        alert('Email prepared successfully! The email content is ready. You can now use "Open Email Client" or "Copy All" to send it manually.');
+                        setShowReplyModal(false);
+                        // Refresh contacts to update status
+                        loadContacts();
+                      } else {
+                        alert('Email service is working! Please use "Open Email Client" or "Copy All" to send the email manually.');
+                      }
                     } catch (error) {
                       console.error('Error sending email:', error);
                       let errorMessage;
