@@ -17,26 +17,62 @@ const createTransporter = () => {
   const emailPass = process.env.EMAIL_PASS;
   
   if (!emailUser || !emailPass || emailUser === 'your-email@gmail.com' || emailPass === 'your-app-password') {
-    throw new Error('Email credentials not configured. Please set EMAIL_USER and EMAIL_PASS environment variables.');
+    throw new Error('Email credentials not configured. Please set EMAIL_USER and EMAIL_PASS environment variables in your deployment settings. For Gmail, use an App Password (not your regular password).');
   }
   
-  // For development, you can use Gmail SMTP or any other email service
-  // You'll need to set up environment variables for production
-  return nodemailer.createTransport({
-    service: 'gmail', // You can change this to your preferred email service
-    auth: {
-      user: emailUser,
-      pass: emailPass
-    },
-    // Add timeout and connection settings
-    connectionTimeout: 10000, // 10 seconds
-    greetingTimeout: 10000,   // 10 seconds
-    socketTimeout: 10000      // 10 seconds
-  });
+  // Support multiple email services
+  const emailService = process.env.EMAIL_SERVICE || 'gmail';
+  
+  let transporterConfig;
+  
+  if (emailService === 'gmail') {
+    transporterConfig = {
+      service: 'gmail',
+      auth: {
+        user: emailUser,
+        pass: emailPass
+      }
+    };
+  } else if (emailService === 'outlook') {
+    transporterConfig = {
+      service: 'hotmail',
+      auth: {
+        user: emailUser,
+        pass: emailPass
+      }
+    };
+  } else if (emailService === 'custom') {
+    // For custom SMTP servers
+    transporterConfig = {
+      host: process.env.SMTP_HOST || 'smtp.gmail.com',
+      port: parseInt(process.env.SMTP_PORT) || 587,
+      secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
+      auth: {
+        user: emailUser,
+        pass: emailPass
+      }
+    };
+  } else {
+    // Default to Gmail
+    transporterConfig = {
+      service: 'gmail',
+      auth: {
+        user: emailUser,
+        pass: emailPass
+      }
+    };
+  }
+  
+  // Add timeout and connection settings
+  transporterConfig.connectionTimeout = 10000; // 10 seconds
+  transporterConfig.greetingTimeout = 10000;   // 10 seconds
+  transporterConfig.socketTimeout = 10000;     // 10 seconds
+  
+  return nodemailer.createTransport(transporterConfig);
 };
 
 // Send reply email to contact
-const sendReplyEmail = async (contactEmail, contactName, subject, message, adminEmail = 'admin@leadmagnet.com') => {
+const sendReplyEmail = async (contactEmail, contactName, subject, message, adminEmail = process.env.EMAIL_USER || 'leadmagnet.notifications@gmail.com') => {
   try {
     const transporter = createTransporter();
     
@@ -87,12 +123,12 @@ const sendReplyEmail = async (contactEmail, contactName, subject, message, admin
 };
 
 // Send notification email to admin when new contact is created
-const sendContactNotification = async (contact, adminEmail = 'admin@leadmagnet.com') => {
+const sendContactNotification = async (contact, adminEmail = process.env.EMAIL_USER || 'leadmagnet.notifications@gmail.com') => {
   try {
     const transporter = createTransporter();
     
     const mailOptions = {
-      from: process.env.EMAIL_USER || 'your-email@gmail.com',
+      from: process.env.EMAIL_USER || 'leadmagnet.notifications@gmail.com',
       to: adminEmail,
       subject: `New Contact: ${contact.name} - ${contact.email}`,
       html: `

@@ -1,4 +1,55 @@
-# Getting Started with Create React App
+# Lead Magnet Admin Dashboard
+
+A comprehensive admin dashboard for managing leads, contacts, users, and subscriptions.
+
+## Features
+
+- **Dashboard**: Overview of users, contacts, and statistics
+- **Users Management**: Create, view, edit, and delete users
+- **Contacts Management**: Manage leads with reply and archive functionality
+- **Subscriptions**: Manage packages and pricing plans
+- **Email Integration**: Send replies to contacts via email
+- **Export Data**: Export users and contacts in CSV/JSON format
+
+## Email Configuration
+
+To enable email functionality, you need to configure email credentials in your deployment environment:
+
+### For Gmail (Recommended)
+
+1. **Enable 2-Factor Authentication** on your Google Account
+2. **Generate App Password**:
+   - Go to Google Account → Security → App passwords
+   - Select "Mail" and generate a password
+   - Copy the 16-character password
+
+3. **Set Environment Variables** in your deployment (Render, Heroku, etc.):
+   ```
+   EMAIL_USER=your-email@gmail.com
+   EMAIL_PASS=your-16-character-app-password
+   EMAIL_SERVICE=gmail
+   ```
+
+### For Other Email Services
+
+**Outlook/Hotmail:**
+```
+EMAIL_USER=your-email@outlook.com
+EMAIL_PASS=your-password
+EMAIL_SERVICE=outlook
+```
+
+**Custom SMTP:**
+```
+EMAIL_USER=your-email@domain.com
+EMAIL_PASS=your-password
+EMAIL_SERVICE=custom
+SMTP_HOST=smtp.your-domain.com
+SMTP_PORT=587
+SMTP_SECURE=false
+```
+
+## Getting Started
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 

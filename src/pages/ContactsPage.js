@@ -314,7 +314,7 @@ const ContactsPage = () => {
                   onClick={async () => {
                     try {
                       setSendingEmail(true);
-                      const adminEmail = 'admin@leadmagnet.com'; // You can make this configurable
+                      const adminEmail = 'leadmagnet.notifications@gmail.com'; // Use the configured email
                       await sendReplyEmail(
                         selectedContact._id,
                         selectedContact.replySubject,
@@ -327,9 +327,16 @@ const ContactsPage = () => {
                       loadContacts();
                     } catch (error) {
                       console.error('Error sending email:', error);
-                      const errorMessage = error.message.includes('credentials') || error.message.includes('timeout') 
-                        ? 'Email service not configured. Please use "Open Email Client" instead.'
-                        : 'Failed to send email: ' + error.message;
+                      let errorMessage;
+                      
+                      if (error.message.includes('credentials') || error.message.includes('not configured')) {
+                        errorMessage = 'Email service not configured. Please use "Open Email Client" or "Copy All" to send emails manually.';
+                      } else if (error.message.includes('timeout')) {
+                        errorMessage = 'Email sending timed out. Please try "Open Email Client" or "Copy All" instead.';
+                      } else {
+                        errorMessage = 'Failed to send email: ' + error.message + '\n\nPlease use "Open Email Client" or "Copy All" to send emails manually.';
+                      }
+                      
                       alert(errorMessage);
                     } finally {
                       setSendingEmail(false);
