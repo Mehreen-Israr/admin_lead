@@ -229,26 +229,28 @@ const UsersPage = () => {
                   </div>
                 </div>
 
-                <div className="detail-section">
-                  <h3>Packages & Services</h3>
-                  <div className="packages-info">
-                    <p className="coming-soon">Package information will be available in future updates</p>
-                    <div className="package-placeholder">
-                      <div className="package-item">
-                        <label>Active Packages:</label>
-                        <span className="placeholder">Coming Soon</span>
-                      </div>
-                      <div className="package-item">
-                        <label>Subscription Status:</label>
-                        <span className="placeholder">Coming Soon</span>
-                      </div>
-                      <div className="package-item">
-                        <label>Package History:</label>
-                        <span className="placeholder">Coming Soon</span>
+                {selectedUser.role !== 'admin' && (
+                  <div className="detail-section">
+                    <h3>Packages & Services</h3>
+                    <div className="packages-info">
+                      <p className="coming-soon">Package information will be available in future updates</p>
+                      <div className="package-placeholder">
+                        <div className="package-item">
+                          <label>Active Packages:</label>
+                          <span className="placeholder">Coming Soon</span>
+                        </div>
+                        <div className="package-item">
+                          <label>Subscription Status:</label>
+                          <span className="placeholder">Coming Soon</span>
+                        </div>
+                        <div className="package-item">
+                          <label>Package History:</label>
+                          <span className="placeholder">Coming Soon</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
             <div className="modal-footer">

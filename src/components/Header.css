@@ -467,7 +467,7 @@
   }
 
   .user-info {
-    display: none; /* hide name/role, keep avatar */
+    display: flex; /* show user info on tablets */
   }
 }
 
@@ -495,20 +495,31 @@
   
   .user-menu-btn {
     padding: var(--space-xs) var(--space-sm);
+    gap: var(--space-xs);
+  }
+  
+  .user-info {
+    display: flex; /* show user info on mobile */
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
   }
   
   .user-avatar {
-    width: 28px;
-    height: 28px;
-    font-size: 0.8rem;
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
   }
   
   .user-name {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
+    line-height: 1;
   }
   
   .user-role {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
+    line-height: 1;
+    opacity: 0.8;
   }
 }
 
@@ -517,28 +528,57 @@
     height: 56px; /* slightly smaller header */
   }
 
+  .header-container {
+    padding: 0 var(--space-xs);
+  }
+
   .mobile-menu-btn {
     width: 36px;
     height: 36px;
   }
 
-  .notification-btn, 
   .user-menu-btn {
-    width: 36px;
-    height: 36px;
-    padding: 0;
+    padding: var(--space-xs);
+    gap: var(--space-xs);
+    min-width: auto;
   }
 
-  .user-menu-btn {
+  .user-menu-btn svg {
+    display: none; /* hide dropdown arrow on very small screens */
+  }
+
+  .user-info {
+    display: flex; /* keep user info visible */
+    flex-direction: column;
+    align-items: flex-start;
     gap: 0;
-    border-radius: 50%; /* just the avatar on very small screens */
-    padding: 0;
+    min-width: 0; /* allow text to shrink */
   }
 
   .user-avatar {
     width: 28px;
     height: 28px;
     font-size: 0.8rem;
+    flex-shrink: 0;
+  }
+
+  .user-name {
+    font-size: 0.7rem;
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 80px;
+  }
+
+  .user-role {
+    font-size: 0.6rem;
+    line-height: 1;
+    opacity: 0.8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 80px;
   }
 
   .header-breadcrumb {
