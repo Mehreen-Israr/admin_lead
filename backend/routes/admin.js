@@ -972,4 +972,38 @@ router.get('/email/debug', adminAuth, async (req, res) => {
   }
 });
 
+// Force reinitialize email service
+router.post('/email/force-reinit', adminAuth, async (req, res) => {
+  try {
+    if (!EmailService) {
+      return res.status(503).json({
+        success: false,
+        message: 'Email service not available'
+      });
+    }
+
+    console.log('Force reinitializing email service...');
+    const reinitialized = await EmailService.reinitialize();
+    
+    if (!reinitialized) {
+      return res.status(503).json({
+        success: false,
+        message: 'Failed to reinitialize email service'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Email service reinitialized successfully',
+      status: EmailService.getStatus()
+    });
+  } catch (error) {
+    console.error('Error force reinitializing email service:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error force reinitializing email service: ' + error.message
+    });
+  }
+});
+
 module.exports = router;

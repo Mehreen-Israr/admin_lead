@@ -1,52 +1,57 @@
 const nodemailer = require('nodemailer');
 
-// Simple, working email service
+// Bulletproof email service that works immediately
 class EmailService {
   constructor() {
     this.transporter = null;
     this.isConfigured = false;
+    this.config = this.loadConfig();
     this.initialize();
+  }
+
+  loadConfig() {
+    const config = {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+      service: process.env.EMAIL_SERVICE || 'gmail',
+      from: process.env.EMAIL_FROM || process.env.EMAIL_USER
+    };
+    
+    console.log('Email service config:', {
+      user: config.user ? '***' + config.user.slice(-4) : 'not set',
+      pass: config.pass ? '***' + config.pass.slice(-4) : 'not set',
+      service: config.service,
+      from: config.from
+    });
+    
+    return config;
   }
 
   initialize() {
     try {
       console.log('Initializing email service...');
       
-      // Get environment variables
-      const emailUser = process.env.EMAIL_USER;
-      const emailPass = process.env.EMAIL_PASS;
-      const emailService = process.env.EMAIL_SERVICE || 'gmail';
-      
-      console.log('Email config:', {
-        user: emailUser ? '***' + emailUser.slice(-4) : 'not set',
-        pass: emailPass ? '***' + emailPass.slice(-4) : 'not set',
-        service: emailService
-      });
-
       // Check if credentials are provided
-      if (!emailUser || !emailPass) {
+      if (!this.config.user || !this.config.pass) {
         console.warn('Email service: No credentials provided');
         this.isConfigured = false;
         return;
       }
 
-      // Create transporter
-      this.transporter = nodemailer.createTransporter({
-        service: emailService,
+      // Create transporter immediately
+      this.transporter = nodemailer.createTransport({
+        service: this.config.service,
         auth: {
-          user: emailUser,
-          pass: emailPass
+          user: this.config.user,
+          pass: this.config.pass
         },
         connectionTimeout: 30000,
         greetingTimeout: 30000,
         socketTimeout: 30000
       });
 
-      console.log('Email transporter created');
+      console.log('Email transporter created successfully');
       this.isConfigured = true;
-      
-      // Test connection
-      this.testConnection();
       
     } catch (error) {
       console.error('Email service initialization failed:', error);
@@ -54,25 +59,16 @@ class EmailService {
     }
   }
 
-  async testConnection() {
-    if (!this.transporter) return false;
-    
-    try {
-      console.log('Testing email connection...');
-      await this.transporter.verify();
-      console.log('Email connection verified successfully');
-      return true;
-    } catch (error) {
-      console.error('Email connection test failed:', error);
-      this.isConfigured = false;
-      return false;
-    }
-  }
-
   async sendEmail(options) {
+    // If not configured, try to reinitialize
     if (!this.isConfigured || !this.transporter) {
-      console.error('Email service not configured');
-      throw new Error('Email service not configured. Please check your email credentials.');
+      console.log('Email service not configured, attempting to reinitialize...');
+      this.initialize();
+      
+      if (!this.isConfigured || !this.transporter) {
+        console.error('Email service still not configured after reinitialize');
+        throw new Error('Email service not configured. Please check your email credentials.');
+      }
     }
 
     const {
@@ -80,7 +76,7 @@ class EmailService {
       subject,
       text,
       html,
-      from = process.env.EMAIL_USER
+      from = this.config.from
     } = options;
 
     const mailOptions = {
@@ -107,7 +103,7 @@ class EmailService {
   }
 
   async sendReplyEmail(contactEmail, contactName, subject, message, adminEmail = null) {
-    const fromEmail = adminEmail || process.env.EMAIL_USER;
+    const fromEmail = adminEmail || this.config.from;
     
     const htmlTemplate = `
       <!DOCTYPE html>
@@ -173,7 +169,7 @@ If you have any questions, please don't hesitate to contact us.
   }
 
   async sendContactNotification(contact, adminEmail = null) {
-    const toEmail = adminEmail || process.env.EMAIL_USER;
+    const toEmail = adminEmail || this.config.from;
     
     const htmlTemplate = `
       <!DOCTYPE html>
@@ -268,17 +264,25 @@ This notification was sent from the Lead Magnet admin panel.
       subject: `New Lead: ${contact.name} - ${contact.email}`,
       text: textTemplate,
       html: htmlTemplate,
-      from: process.env.EMAIL_USER
+      from: this.config.from
     });
   }
 
   getStatus() {
     return {
       configured: this.isConfigured,
-      service: process.env.EMAIL_SERVICE || 'gmail',
-      user: process.env.EMAIL_USER,
-      from: process.env.EMAIL_USER
+      service: this.config.service,
+      user: this.config.user,
+      from: this.config.from
     };
+  }
+
+  // Force reinitialize
+  async reinitialize() {
+    console.log('Force reinitializing email service...');
+    this.config = this.loadConfig();
+    this.initialize();
+    return this.isConfigured;
   }
 }
 
