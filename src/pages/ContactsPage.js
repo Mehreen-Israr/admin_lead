@@ -30,38 +30,16 @@ const ContactsPage = () => {
   };
 
   const handleReply = (contact) => {
-    try {
-      const subject = `Re: Your inquiry about ${contact.service || 'our services'}`;
-      const body = `Hi ${contact.name},\n\nThank you for your interest in our services. I'm writing to follow up on your inquiry.\n\nBest regards,\n[Your Name]`;
-      
-      // Clean the email address
-      const cleanEmail = contact.email.trim();
-      
-      // Create mailto link with proper encoding
-      const mailtoLink = `mailto:${cleanEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      
-      // Try to open email client
-      try {
-        window.location.href = mailtoLink;
-      } catch (error) {
-        // Fallback: Show modal with email details
-        setSelectedContact({
-          ...contact,
-          replySubject: subject,
-          replyBody: body
-        });
-        setShowReplyModal(true);
-      }
-    } catch (error) {
-      console.error('Error opening email client:', error);
-      // Fallback: Show modal with email details
-      setSelectedContact({
-        ...contact,
-        replySubject: `Re: Your inquiry about ${contact.service || 'our services'}`,
-        replyBody: `Hi ${contact.name},\n\nThank you for your interest in our services. I'm writing to follow up on your inquiry.\n\nBest regards,\n[Your Name]`
-      });
-      setShowReplyModal(true);
-    }
+    const subject = `Re: Your inquiry about ${contact.service || 'our services'}`;
+    const body = `Hi ${contact.name},\n\nThank you for your interest in our services. I'm writing to follow up on your inquiry.\n\nBest regards,\n[Your Name]`;
+    
+    // Always show the modal first - this is more reliable
+    setSelectedContact({
+      ...contact,
+      replySubject: subject,
+      replyBody: body
+    });
+    setShowReplyModal(true);
   };
 
   const handleArchive = async (contactId, isArchived) => {
@@ -283,8 +261,27 @@ const ContactsPage = () => {
                 <button 
                   className="btn-primary"
                   onClick={() => {
-                    const mailtoLink = `mailto:${selectedContact.email}?subject=${encodeURIComponent(selectedContact.replySubject)}&body=${encodeURIComponent(selectedContact.replyBody)}`;
-                    window.location.href = mailtoLink;
+                    try {
+                      const mailtoLink = `mailto:${selectedContact.email}?subject=${encodeURIComponent(selectedContact.replySubject)}&body=${encodeURIComponent(selectedContact.replyBody)}`;
+                      
+                      // Try multiple methods to open email client
+                      try {
+                        // Method 1: Direct window.location
+                        window.location.href = mailtoLink;
+                      } catch (error) {
+                        // Method 2: Create and click link
+                        const link = document.createElement('a');
+                        link.href = mailtoLink;
+                        link.target = '_blank';
+                        link.style.display = 'none';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                      }
+                    } catch (error) {
+                      console.error('Error opening email client:', error);
+                      alert('Unable to open email client. Please copy the email address and send manually.');
+                    }
                   }}
                 >
                   <i className="fas fa-envelope"></i>
@@ -300,6 +297,18 @@ const ContactsPage = () => {
                 >
                   <i className="fas fa-copy"></i>
                   Copy Email
+                </button>
+                
+                <button 
+                  className="btn-secondary"
+                  onClick={() => {
+                    const emailContent = `To: ${selectedContact.email}\nSubject: ${selectedContact.replySubject}\n\n${selectedContact.replyBody}`;
+                    navigator.clipboard.writeText(emailContent);
+                    alert('Email content copied to clipboard!');
+                  }}
+                >
+                  <i className="fas fa-clipboard"></i>
+                  Copy All
                 </button>
                 
                 <button 

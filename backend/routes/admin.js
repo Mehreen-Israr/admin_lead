@@ -216,15 +216,22 @@ router.post('/packages', adminAuth, async (req, res) => {
       benefits: Array.isArray(body.benefits) ? body.benefits : (body.benefits ? [body.benefits] : []),
       imageUrl: body.imageUrl,
       pricing: body.pricing,
-      price: body.price,
+      price: body.price || 0, // Ensure price is never undefined
       currency: body.currency,
       isActive: body.isActive !== undefined ? body.isActive : true,
-      sortOrder: body.sortOrder
+      sortOrder: body.sortOrder || 0
     });
     await pkg.save();
     res.status(201).json({ success: true, data: pkg });
   } catch (error) {
     console.error('Error creating package:', error);
+    if (error.name === 'ValidationError') {
+      const errors = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Validation error: ' + errors.join(', ') 
+      });
+    }
     res.status(500).json({ success: false, message: 'Server error while creating package' });
   }
 });

@@ -20,7 +20,7 @@ const PackageSchema = new mongoose.Schema(
       trialDays: { type: Number, default: 0 }
     },
     // Root price mirrors your collection (required)
-    price: { type: Number, required: true, min: 0 },
+    price: { type: Number, required: true, min: 0, default: 0 },
     // Root currency is legacy/fallback only
     currency: { type: String, trim: true },
     isActive: { type: Boolean, default: true },

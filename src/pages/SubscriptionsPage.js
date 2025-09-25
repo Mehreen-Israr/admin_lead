@@ -80,6 +80,18 @@ const SubscriptionsPage = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate required fields
+    if (!form.name.trim()) {
+      alert('Package name is required');
+      return;
+    }
+    
+    if (!form.price || form.price === '') {
+      alert('Price is required');
+      return;
+    }
+    
     try {
       setSaving(true);
       const payload = {
@@ -91,11 +103,11 @@ const SubscriptionsPage = () => {
         benefits: form.benefits.split(',').map((b) => b.trim()).filter(Boolean),
         imageUrl: form.imageUrl,
         // keep both structures to match backend compatibility
-        price: form.price !== '' ? Number(form.price) : undefined,
+        price: form.price !== '' ? Number(form.price) : 0,
         currency: form.currency,
         pricing: {
           currency: form.pricing.currency,
-          amount: form.pricing.amount !== '' ? Number(form.pricing.amount) : (form.price !== '' ? Number(form.price) : undefined),
+          amount: form.pricing.amount !== '' ? Number(form.pricing.amount) : (form.price !== '' ? Number(form.price) : 0),
           discount: form.pricing.discount,
           popular: !!form.pricing.popular,
           trialDays: Number(form.pricing.trialDays || 0)
@@ -111,6 +123,7 @@ const SubscriptionsPage = () => {
       setShowForm(false);
       await loadPackages();
     } catch (e) {
+      console.error('Error saving package:', e);
       alert(e.message || 'Save failed');
     } finally {
       setSaving(false);
