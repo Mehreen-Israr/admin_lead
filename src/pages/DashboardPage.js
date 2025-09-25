@@ -78,15 +78,15 @@ const DashboardPage = () => {
   const handleExportData = async (type) => {
     try {
       if (type === 'all') {
-        // Export both users and contacts
-        await exportData('users');
-        await exportData('contacts');
+        // Use the backend's 'all' endpoint which returns JSON with both users and contacts
+        await exportData('all', 'json');
         alert('All data (users and contacts) exported successfully!');
       } else {
         await exportData(type);
         alert(`${type.charAt(0).toUpperCase() + type.slice(1)} data exported successfully!`);
       }
     } catch (error) {
+      console.error('Export error:', error);
       alert(`Error exporting data: ${error.message}`);
     }
   };

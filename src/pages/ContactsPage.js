@@ -8,6 +8,8 @@ const ContactsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('active'); // 'active' or 'archived'
+  const [showReplyModal, setShowReplyModal] = useState(false);
+  const [selectedContact, setSelectedContact] = useState(null);
 
   useEffect(() => {
     loadContacts();
@@ -28,10 +30,38 @@ const ContactsPage = () => {
   };
 
   const handleReply = (contact) => {
-    const subject = `Re: Your inquiry about ${contact.service || 'our services'}`;
-    const body = `Hi ${contact.name},\n\nThank you for your interest in our services. I'm writing to follow up on your inquiry.\n\nBest regards,\n[Your Name]`;
-    const mailtoLink = `mailto:${contact.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.open(mailtoLink);
+    try {
+      const subject = `Re: Your inquiry about ${contact.service || 'our services'}`;
+      const body = `Hi ${contact.name},\n\nThank you for your interest in our services. I'm writing to follow up on your inquiry.\n\nBest regards,\n[Your Name]`;
+      
+      // Clean the email address
+      const cleanEmail = contact.email.trim();
+      
+      // Create mailto link with proper encoding
+      const mailtoLink = `mailto:${cleanEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      
+      // Try to open email client
+      try {
+        window.location.href = mailtoLink;
+      } catch (error) {
+        // Fallback: Show modal with email details
+        setSelectedContact({
+          ...contact,
+          replySubject: subject,
+          replyBody: body
+        });
+        setShowReplyModal(true);
+      }
+    } catch (error) {
+      console.error('Error opening email client:', error);
+      // Fallback: Show modal with email details
+      setSelectedContact({
+        ...contact,
+        replySubject: `Re: Your inquiry about ${contact.service || 'our services'}`,
+        replyBody: `Hi ${contact.name},\n\nThank you for your interest in our services. I'm writing to follow up on your inquiry.\n\nBest regards,\n[Your Name]`
+      });
+      setShowReplyModal(true);
+    }
   };
 
   const handleArchive = async (contactId, isArchived) => {
@@ -199,6 +229,88 @@ const ContactsPage = () => {
               {searchTerm ? 'No contacts found matching your search.' : 'No contacts found.'}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Reply Modal */}
+      {showReplyModal && selectedContact && (
+        <div className="modal-overlay" onClick={() => setShowReplyModal(false)}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Reply to {selectedContact.name}</h2>
+              <button 
+                className="modal-close"
+                onClick={() => setShowReplyModal(false)}
+              >
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+            
+            <div className="modal-body">
+              <div className="email-details">
+                <div className="email-field">
+                  <label>To:</label>
+                  <input 
+                    type="email" 
+                    value={selectedContact.email} 
+                    readOnly 
+                    className="email-input"
+                  />
+                </div>
+                
+                <div className="email-field">
+                  <label>Subject:</label>
+                  <input 
+                    type="text" 
+                    value={selectedContact.replySubject} 
+                    readOnly 
+                    className="email-input"
+                  />
+                </div>
+                
+                <div className="email-field">
+                  <label>Message:</label>
+                  <textarea 
+                    value={selectedContact.replyBody} 
+                    readOnly 
+                    rows="8"
+                    className="email-textarea"
+                  />
+                </div>
+              </div>
+              
+              <div className="modal-actions">
+                <button 
+                  className="btn-primary"
+                  onClick={() => {
+                    const mailtoLink = `mailto:${selectedContact.email}?subject=${encodeURIComponent(selectedContact.replySubject)}&body=${encodeURIComponent(selectedContact.replyBody)}`;
+                    window.location.href = mailtoLink;
+                  }}
+                >
+                  <i className="fas fa-envelope"></i>
+                  Open Email Client
+                </button>
+                
+                <button 
+                  className="btn-secondary"
+                  onClick={() => {
+                    navigator.clipboard.writeText(selectedContact.email);
+                    alert('Email address copied to clipboard!');
+                  }}
+                >
+                  <i className="fas fa-copy"></i>
+                  Copy Email
+                </button>
+                
+                <button 
+                  className="btn-secondary"
+                  onClick={() => setShowReplyModal(false)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -783,3 +783,115 @@
     font-size: 0.8rem;
   }
 }
+
+/* Reply Modal Styles */
+.email-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+}
+
+.email-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.email-field label {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.email-input, .email-textarea {
+  width: 100%;
+  padding: var(--space-md);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--border-radius-md);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: all var(--transition-normal);
+  backdrop-filter: blur(10px);
+}
+
+.email-input:focus, .email-textarea:focus {
+  outline: none;
+  border-color: var(--primary-400);
+  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1);
+  background: var(--bg-card);
+}
+
+.email-textarea {
+  resize: vertical;
+  min-height: 120px;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+.modal-actions {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.modal-actions .btn-primary {
+  background: var(--primary-600);
+  color: var(--bg-primary);
+  border: 1px solid var(--primary-600);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--border-radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.modal-actions .btn-primary:hover {
+  background: var(--primary-700);
+  border-color: var(--primary-700);
+  transform: translateY(-1px);
+}
+
+.modal-actions .btn-secondary {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-primary);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--border-radius-md);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.modal-actions .btn-secondary:hover {
+  background: var(--bg-card);
+  border-color: var(--primary-400);
+  color: var(--primary-400);
+  transform: translateY(-1px);
+}
+
+/* Mobile Responsive for Reply Modal */
+@media (max-width: 768px) {
+  .modal-actions {
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+  
+  .modal-actions .btn-primary,
+  .modal-actions .btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .email-textarea {
+    min-height: 100px;
+  }
+}

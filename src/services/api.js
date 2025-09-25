@@ -189,7 +189,9 @@ export const exportData = async (type, format = 'csv') => {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to export data');
+      const errorText = await response.text();
+      console.error('Export response error:', errorText);
+      throw new Error(`Failed to export data: ${response.status} ${response.statusText}`);
     }
 
     // Get filename from response headers
@@ -198,17 +200,35 @@ export const exportData = async (type, format = 'csv') => {
       ? contentDisposition.split('filename="')[1].split('"')[0]
       : `export_${type}_${new Date().toISOString().split('T')[0]}.${format}`;
 
-    const blob = await response.blob();
+    // Handle different content types
+    const contentType = response.headers.get('Content-Type');
     
-    // Create download link
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
+    if (contentType && contentType.includes('application/json')) {
+      // For JSON exports (like 'all'), create a JSON file
+      const jsonData = await response.json();
+      const blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json' });
+      
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } else {
+      // For CSV exports
+      const blob = await response.blob();
+      
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    }
 
     return { success: true, filename };
   } catch (error) {
