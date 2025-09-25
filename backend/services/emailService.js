@@ -1,127 +1,51 @@
 const nodemailer = require('nodemailer');
 
-// Professional email service with comprehensive error handling
+// Simple, working email service
 class EmailService {
   constructor() {
     this.transporter = null;
     this.isConfigured = false;
-    this.config = this.loadConfig();
-    this.initializeTransporter();
+    this.initialize();
   }
 
-  loadConfig() {
-    const config = {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-      service: process.env.EMAIL_SERVICE || 'gmail',
-      host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT) || 587,
-      secure: process.env.SMTP_SECURE === 'true',
-      from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
-      replyTo: process.env.EMAIL_REPLY_TO || process.env.EMAIL_USER
-    };
-    
-    console.log('Email service config loaded:', {
-      user: config.user ? '***' + config.user.slice(-4) : 'not set',
-      pass: config.pass ? '***' + config.pass.slice(-4) : 'not set',
-      service: config.service,
-      from: config.from
-    });
-    
-    return config;
-  }
-
-  initializeTransporter() {
+  initialize() {
     try {
-      // Check if email credentials are provided
-      if (!this.config.user || !this.config.pass) {
-        console.warn('Email service: No credentials provided. Email functionality disabled.');
-        console.warn('Please set EMAIL_USER and EMAIL_PASS environment variables in Render.');
+      console.log('Initializing email service...');
+      
+      // Get environment variables
+      const emailUser = process.env.EMAIL_USER;
+      const emailPass = process.env.EMAIL_PASS;
+      const emailService = process.env.EMAIL_SERVICE || 'gmail';
+      
+      console.log('Email config:', {
+        user: emailUser ? '***' + emailUser.slice(-4) : 'not set',
+        pass: emailPass ? '***' + emailPass.slice(-4) : 'not set',
+        service: emailService
+      });
+
+      // Check if credentials are provided
+      if (!emailUser || !emailPass) {
+        console.warn('Email service: No credentials provided');
+        this.isConfigured = false;
         return;
       }
 
-      // Check for default/placeholder values
-      if (this.config.user === 'your-email@gmail.com' || 
-          this.config.pass === 'your-app-password' ||
-          this.config.user.includes('your-email') ||
-          this.config.pass.includes('your-')) {
-        console.warn('Email service: Placeholder credentials detected. Email functionality disabled.');
-        console.warn('Please set real email credentials in Render environment variables.');
-        return;
-      }
+      // Create transporter
+      this.transporter = nodemailer.createTransporter({
+        service: emailService,
+        auth: {
+          user: emailUser,
+          pass: emailPass
+        },
+        connectionTimeout: 30000,
+        greetingTimeout: 30000,
+        socketTimeout: 30000
+      });
 
-      console.log('Email service: Initializing with credentials...');
-
-      let transporterConfig;
-
-      // Configure based on service type
-      switch (this.config.service.toLowerCase()) {
-        case 'gmail':
-          transporterConfig = {
-            service: 'gmail',
-            auth: {
-              user: this.config.user,
-              pass: this.config.pass
-            },
-            connectionTimeout: 30000,
-            greetingTimeout: 30000,
-            socketTimeout: 30000,
-            pool: true,
-            maxConnections: 5,
-            maxMessages: 100,
-            rateDelta: 20000,
-            rateLimit: 5
-          };
-          break;
-
-        case 'outlook':
-        case 'hotmail':
-          transporterConfig = {
-            service: 'hotmail',
-            auth: {
-              user: this.config.user,
-              pass: this.config.pass
-            },
-            connectionTimeout: 30000,
-            greetingTimeout: 30000,
-            socketTimeout: 30000
-          };
-          break;
-
-        case 'custom':
-          transporterConfig = {
-            host: this.config.host || 'smtp.gmail.com',
-            port: this.config.port,
-            secure: this.config.secure,
-            auth: {
-              user: this.config.user,
-              pass: this.config.pass
-            },
-            connectionTimeout: 30000,
-            greetingTimeout: 30000,
-            socketTimeout: 30000
-          };
-          break;
-
-        default:
-          transporterConfig = {
-            service: 'gmail',
-            auth: {
-              user: this.config.user,
-              pass: this.config.pass
-            },
-            connectionTimeout: 30000,
-            greetingTimeout: 30000,
-            socketTimeout: 30000
-          };
-      }
-
-      this.transporter = nodemailer.createTransporter(transporterConfig);
+      console.log('Email transporter created');
       this.isConfigured = true;
       
-      console.log('Email service: Transporter created successfully');
-      
-      // Test the connection
+      // Test connection
       this.testConnection();
       
     } catch (error) {
@@ -131,18 +55,15 @@ class EmailService {
   }
 
   async testConnection() {
-    if (!this.transporter) {
-      console.log('Email service: No transporter available for testing');
-      return false;
-    }
+    if (!this.transporter) return false;
     
     try {
-      console.log('Email service: Testing connection...');
+      console.log('Testing email connection...');
       await this.transporter.verify();
-      console.log('Email service: Connection verified successfully');
+      console.log('Email connection verified successfully');
       return true;
     } catch (error) {
-      console.error('Email service: Connection verification failed:', error);
+      console.error('Email connection test failed:', error);
       this.isConfigured = false;
       return false;
     }
@@ -150,13 +71,7 @@ class EmailService {
 
   async sendEmail(options) {
     if (!this.isConfigured || !this.transporter) {
-      console.error('Email service: Not configured or transporter not available');
-      console.error('Email service config:', {
-        configured: this.isConfigured,
-        hasTransporter: !!this.transporter,
-        user: this.config.user ? '***' + this.config.user.slice(-4) : 'not set',
-        pass: this.config.pass ? '***' + this.config.pass.slice(-4) : 'not set'
-      });
+      console.error('Email service not configured');
       throw new Error('Email service not configured. Please check your email credentials.');
     }
 
@@ -165,52 +80,34 @@ class EmailService {
       subject,
       text,
       html,
-      replyTo = this.config.replyTo,
-      from = this.config.from
+      from = process.env.EMAIL_USER
     } = options;
 
     const mailOptions = {
-      from: `${from} <${this.config.user}>`,
-      to: Array.isArray(to) ? to.join(', ') : to,
+      from: from,
+      to: to,
       subject: subject,
       text: text,
-      html: html,
-      replyTo: replyTo,
-      headers: {
-        'X-Mailer': 'Lead Magnet Admin',
-        'X-Priority': '3',
-        'Importance': 'normal'
-      }
+      html: html
     };
 
     try {
-      console.log(`Email service: Sending email to ${to}`);
+      console.log(`Sending email to ${to}`);
       const result = await this.transporter.sendMail(mailOptions);
-      console.log(`Email service: Email sent successfully. Message ID: ${result.messageId}`);
+      console.log('Email sent successfully:', result.messageId);
       return {
         success: true,
         messageId: result.messageId,
         response: result.response
       };
     } catch (error) {
-      console.error('Email service: Send failed:', error);
-      
-      // Provide specific error messages
-      if (error.code === 'EAUTH') {
-        throw new Error('Email authentication failed. Please check your email credentials.');
-      } else if (error.code === 'ECONNECTION') {
-        throw new Error('Email connection failed. Please check your internet connection.');
-      } else if (error.code === 'ETIMEDOUT') {
-        throw new Error('Email sending timed out. Please try again.');
-      } else {
-        throw new Error(`Email sending failed: ${error.message}`);
-      }
+      console.error('Error sending email:', error);
+      throw new Error('Failed to send email: ' + error.message);
     }
   }
 
-  // Send reply email to contact
   async sendReplyEmail(contactEmail, contactName, subject, message, adminEmail = null) {
-    const fromEmail = adminEmail || this.config.from;
+    const fromEmail = adminEmail || process.env.EMAIL_USER;
     
     const htmlTemplate = `
       <!DOCTYPE html>
@@ -275,9 +172,8 @@ If you have any questions, please don't hesitate to contact us.
     });
   }
 
-  // Send notification email to admin
   async sendContactNotification(contact, adminEmail = null) {
-    const toEmail = adminEmail || this.config.from;
+    const toEmail = adminEmail || process.env.EMAIL_USER;
     
     const htmlTemplate = `
       <!DOCTYPE html>
@@ -372,26 +268,17 @@ This notification was sent from the Lead Magnet admin panel.
       subject: `New Lead: ${contact.name} - ${contact.email}`,
       text: textTemplate,
       html: htmlTemplate,
-      from: this.config.from
+      from: process.env.EMAIL_USER
     });
   }
 
-  // Get service status
   getStatus() {
     return {
       configured: this.isConfigured,
-      service: this.config.service,
-      user: this.config.user,
-      from: this.config.from
+      service: process.env.EMAIL_SERVICE || 'gmail',
+      user: process.env.EMAIL_USER,
+      from: process.env.EMAIL_USER
     };
-  }
-
-  // Reinitialize the email service
-  async reinitialize() {
-    console.log('Email service: Reinitializing...');
-    this.config = this.loadConfig();
-    this.initializeTransporter();
-    return this.isConfigured;
   }
 }
 
