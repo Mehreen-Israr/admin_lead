@@ -38,17 +38,41 @@ class EmailService {
         return;
       }
 
-      // Create transporter immediately
-      this.transporter = nodemailer.createTransport({
-        service: this.config.service,
-        auth: {
-          user: this.config.user,
-          pass: this.config.pass
-        },
-        connectionTimeout: 30000,
-        greetingTimeout: 30000,
-        socketTimeout: 30000
-      });
+      // Create transporter with optimized settings for Gmail
+      let transporterConfig;
+      
+      if (this.config.service.toLowerCase() === 'gmail') {
+        // Gmail-specific configuration
+        transporterConfig = {
+          host: 'smtp.gmail.com',
+          port: 587,
+          secure: false, // true for 465, false for other ports
+          auth: {
+            user: this.config.user,
+            pass: this.config.pass
+          },
+          connectionTimeout: 60000,
+          greetingTimeout: 30000,
+          socketTimeout: 60000,
+          tls: {
+            rejectUnauthorized: false
+          }
+        };
+      } else {
+        // Generic configuration
+        transporterConfig = {
+          service: this.config.service,
+          auth: {
+            user: this.config.user,
+            pass: this.config.pass
+          },
+          connectionTimeout: 60000,
+          greetingTimeout: 30000,
+          socketTimeout: 60000
+        };
+      }
+      
+      this.transporter = nodemailer.createTransport(transporterConfig);
 
       console.log('Email transporter created successfully');
       this.isConfigured = true;
@@ -87,19 +111,40 @@ class EmailService {
       html: html
     };
 
-    try {
-      console.log(`Sending email to ${to}`);
-      const result = await this.transporter.sendMail(mailOptions);
-      console.log('Email sent successfully:', result.messageId);
-      return {
-        success: true,
-        messageId: result.messageId,
-        response: result.response
-      };
-    } catch (error) {
-      console.error('Error sending email:', error);
-      throw new Error('Failed to send email: ' + error.message);
+    // Retry mechanism for connection issues
+    let lastError;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        console.log(`Sending email to ${to} (attempt ${attempt}/3)`);
+        const result = await this.transporter.sendMail(mailOptions);
+        console.log('Email sent successfully:', result.messageId);
+        return {
+          success: true,
+          messageId: result.messageId,
+          response: result.response
+        };
+      } catch (error) {
+        console.error(`Email attempt ${attempt} failed:`, error.message);
+        lastError = error;
+        
+        // If it's a connection timeout, wait before retry
+        if (error.code === 'ETIMEDOUT' && attempt < 3) {
+          console.log(`Waiting 5 seconds before retry ${attempt + 1}...`);
+          await new Promise(resolve => setTimeout(resolve, 5000));
+          
+          // Recreate transporter for retry
+          this.initialize();
+          continue;
+        }
+        
+        // If it's not a timeout or it's the last attempt, throw the error
+        if (attempt === 3 || error.code !== 'ETIMEDOUT') {
+          throw new Error('Failed to send email: ' + error.message);
+        }
+      }
     }
+    
+    throw new Error('Failed to send email after 3 attempts: ' + lastError.message);
   }
 
   async sendReplyEmail(contactEmail, contactName, subject, message, adminEmail = null) {
