@@ -1,7 +1,17 @@
-const nodemailer = require('nodemailer');
+let nodemailer;
+try {
+  nodemailer = require('nodemailer');
+} catch (error) {
+  console.warn('Nodemailer not available. Email functionality will be disabled.');
+  nodemailer = null;
+}
 
 // Email configuration
 const createTransporter = () => {
+  if (!nodemailer) {
+    throw new Error('Email service not configured. Please install nodemailer and configure email settings.');
+  }
+  
   // For development, you can use Gmail SMTP or any other email service
   // You'll need to set up environment variables for production
   return nodemailer.createTransporter({

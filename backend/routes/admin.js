@@ -6,7 +6,13 @@ const adminAuth = require('../middleware/adminAuth');
 const Package = require('../models/Package');
 const Notification = require('../models/Notification');
 const NotificationService = require('../services/notificationService');
-const EmailService = require('../services/emailService');
+let EmailService;
+try {
+  EmailService = require('../services/emailService');
+} catch (error) {
+  console.warn('Email service not available:', error.message);
+  EmailService = null;
+}
 const json2csv = require('json2csv').parse;
 
 // Get all users
@@ -390,6 +396,13 @@ router.post('/contacts/:id/reply', adminAuth, async (req, res) => {
     
     if (!contact) {
       return res.status(404).json({ success: false, message: 'Contact not found' });
+    }
+
+    if (!EmailService) {
+      return res.status(503).json({ 
+        success: false, 
+        message: 'Email service not configured. Please set up email credentials.' 
+      });
     }
 
     // Send the reply email
