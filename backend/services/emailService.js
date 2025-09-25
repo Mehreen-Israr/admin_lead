@@ -50,6 +50,8 @@ class EmailService {
         return;
       }
 
+      console.log('Email service: Initializing with credentials...');
+
       let transporterConfig;
 
       // Configure based on service type
@@ -117,6 +119,8 @@ class EmailService {
       this.transporter = nodemailer.createTransporter(transporterConfig);
       this.isConfigured = true;
       
+      console.log('Email service: Transporter created successfully');
+      
       // Test the connection
       this.testConnection();
       
@@ -127,9 +131,13 @@ class EmailService {
   }
 
   async testConnection() {
-    if (!this.transporter) return false;
+    if (!this.transporter) {
+      console.log('Email service: No transporter available for testing');
+      return false;
+    }
     
     try {
+      console.log('Email service: Testing connection...');
       await this.transporter.verify();
       console.log('Email service: Connection verified successfully');
       return true;
@@ -142,6 +150,13 @@ class EmailService {
 
   async sendEmail(options) {
     if (!this.isConfigured || !this.transporter) {
+      console.error('Email service: Not configured or transporter not available');
+      console.error('Email service config:', {
+        configured: this.isConfigured,
+        hasTransporter: !!this.transporter,
+        user: this.config.user ? '***' + this.config.user.slice(-4) : 'not set',
+        pass: this.config.pass ? '***' + this.config.pass.slice(-4) : 'not set'
+      });
       throw new Error('Email service not configured. Please check your email credentials.');
     }
 
@@ -369,6 +384,14 @@ This notification was sent from the Lead Magnet admin panel.
       user: this.config.user,
       from: this.config.from
     };
+  }
+
+  // Reinitialize the email service
+  async reinitialize() {
+    console.log('Email service: Reinitializing...');
+    this.config = this.loadConfig();
+    this.initializeTransporter();
+    return this.isConfigured;
   }
 }
 

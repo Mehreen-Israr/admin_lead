@@ -211,11 +211,7 @@ const DashboardPage = () => {
       <div className="stats-section">
         <div className="section-header">
           <h2>Key Metrics</h2>
-          <div className="time-filter">
-            <button className="filter-btn active">7 Days</button>
-            <button className="filter-btn">30 Days</button>
-            <button className="filter-btn">90 Days</button>
-          </div>
+          
         </div>
         
         <div className="stats-grid">

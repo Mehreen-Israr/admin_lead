@@ -871,6 +871,38 @@ router.get('/email/test', adminAuth, async (req, res) => {
   }
 });
 
+// Reinitialize email service
+router.post('/email/reinitialize', adminAuth, async (req, res) => {
+  try {
+    if (!EmailService) {
+      return res.status(503).json({
+        success: false,
+        message: 'Email service not available'
+      });
+    }
+
+    const reinitialized = await EmailService.reinitialize();
+    
+    if (!reinitialized) {
+      return res.status(503).json({
+        success: false,
+        message: 'Failed to reinitialize email service'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Email service reinitialized successfully'
+    });
+  } catch (error) {
+    console.error('Error reinitializing email service:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error reinitializing email service: ' + error.message
+    });
+  }
+});
+
 // Send test email
 router.post('/email/test', adminAuth, async (req, res) => {
   try {
@@ -909,6 +941,33 @@ router.post('/email/test', adminAuth, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error sending test email: ' + error.message
+    });
+  }
+});
+
+// Debug email service
+router.get('/email/debug', adminAuth, async (req, res) => {
+  try {
+    const debugInfo = {
+      emailServiceAvailable: !!EmailService,
+      environmentVariables: {
+        EMAIL_USER: process.env.EMAIL_USER ? '***' + process.env.EMAIL_USER.slice(-4) : 'not set',
+        EMAIL_PASS: process.env.EMAIL_PASS ? '***' + process.env.EMAIL_PASS.slice(-4) : 'not set',
+        EMAIL_SERVICE: process.env.EMAIL_SERVICE || 'not set',
+        EMAIL_FROM: process.env.EMAIL_FROM || 'not set'
+      },
+      serviceStatus: EmailService ? EmailService.getStatus() : 'not available'
+    };
+
+    res.json({
+      success: true,
+      debug: debugInfo
+    });
+  } catch (error) {
+    console.error('Error getting email debug info:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error getting email debug info: ' + error.message
     });
   }
 });
