@@ -1,7 +1,45 @@
 // Email Test Page - Professional Email Service Testing
 import React, { useState, useEffect } from 'react';
-import { api } from '../services/api';
 import './EmailTestPage.css';
+
+// API helper functions
+const getApiBaseUrl = () => {
+  if (process.env.NODE_ENV === 'development') {
+    return process.env.REACT_APP_BACKEND_URL || 'http://localhost:5001';
+  }
+  return process.env.REACT_APP_BACKEND_URL || 'https://admin-lead-backend.onrender.com';
+};
+
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('adminToken');
+  return {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  };
+};
+
+const api = {
+  get: async (endpoint) => {
+    const response = await fetch(`${getApiBaseUrl()}${endpoint}`, {
+      headers: getAuthHeaders()
+    });
+    if (!response.ok) {
+      throw new Error(`API request failed: ${response.status}`);
+    }
+    return await response.json();
+  },
+  post: async (endpoint, data) => {
+    const response = await fetch(`${getApiBaseUrl()}${endpoint}`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    });
+    if (!response.ok) {
+      throw new Error(`API request failed: ${response.status}`);
+    }
+    return await response.json();
+  }
+};
 
 const EmailTestPage = () => {
   const [emailStatus, setEmailStatus] = useState(null);
