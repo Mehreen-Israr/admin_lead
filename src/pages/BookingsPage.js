@@ -22,6 +22,8 @@ const BookingsPage = () => {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [editForm, setEditForm] = useState({});
+  const [savingEdit, setSavingEdit] = useState(false);
   const [stats, setStats] = useState({});
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [deletingBooking, setDeletingBooking] = useState(null);
@@ -145,6 +147,66 @@ const BookingsPage = () => {
       alert('Failed to delete booking');
     } finally {
       setDeletingBooking(null);
+    }
+  };
+
+  // Handle edit booking
+  const handleEditBooking = (booking) => {
+    setEditForm({
+      _id: booking._id,
+      meetingTitle: booking.meetingTitle || '',
+      meetingType: booking.meetingType || '',
+      duration: booking.duration || 30,
+      timezone: booking.timezone || '',
+      attendee: {
+        name: booking.attendee?.name || '',
+        email: booking.attendee?.email || ''
+      },
+      scheduledTime: booking.scheduledTime ? new Date(booking.scheduledTime).toISOString().slice(0, 16) : '',
+      status: booking.status || 'scheduled',
+      adminNotes: booking.adminNotes || '',
+      followUpSent: booking.followUpSent || false,
+      reminderSent: booking.reminderSent || false,
+      cancellationReason: booking.cancellationReason || ''
+    });
+    setShowEditModal(true);
+  };
+
+  // Handle save edit
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      setSavingEdit(true);
+      
+      // Prepare update data
+      const updateData = {
+        meetingTitle: editForm.meetingTitle,
+        meetingType: editForm.meetingType,
+        duration: parseInt(editForm.duration),
+        timezone: editForm.timezone,
+        attendee: {
+          name: editForm.attendee.name,
+          email: editForm.attendee.email
+        },
+        scheduledTime: new Date(editForm.scheduledTime),
+        status: editForm.status,
+        adminNotes: editForm.adminNotes,
+        followUpSent: editForm.followUpSent,
+        reminderSent: editForm.reminderSent,
+        cancellationReason: editForm.cancellationReason
+      };
+
+      await updateBooking(editForm._id, updateData);
+      alert('Booking updated successfully!');
+      setShowEditModal(false);
+      loadBookings();
+      loadStats();
+    } catch (error) {
+      console.error('Error updating booking:', error);
+      alert('Failed to update booking');
+    } finally {
+      setSavingEdit(false);
     }
   };
 
@@ -381,10 +443,7 @@ const BookingsPage = () => {
                         </button>
                         <button
                           className="btn-edit"
-                          onClick={() => {
-                            setSelectedBooking(booking);
-                            setShowEditModal(true);
-                          }}
+                          onClick={() => handleEditBooking(booking)}
                           title="Edit Booking"
                         >
                           <i className="fas fa-edit"></i>
@@ -573,6 +632,196 @@ const BookingsPage = () => {
                 Update Status
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Booking Modal */}
+      {showEditModal && (
+        <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
+          <div className="modal-content edit-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Edit Booking</h3>
+              <button className="modal-close" onClick={() => setShowEditModal(false)}>
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+            <form onSubmit={handleSaveEdit} className="modal-form">
+              <div className="form-sections">
+                {/* Meeting Information */}
+                <div className="form-section">
+                  <h4>Meeting Information</h4>
+                  <div className="form-grid">
+                    <div className="form-group">
+                      <label>Meeting Title</label>
+                      <input
+                        type="text"
+                        value={editForm.meetingTitle || ''}
+                        onChange={(e) => setEditForm({...editForm, meetingTitle: e.target.value})}
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Meeting Type</label>
+                      <input
+                        type="text"
+                        value={editForm.meetingType || ''}
+                        onChange={(e) => setEditForm({...editForm, meetingType: e.target.value})}
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Duration (minutes)</label>
+                      <input
+                        type="number"
+                        value={editForm.duration || 30}
+                        onChange={(e) => setEditForm({...editForm, duration: e.target.value})}
+                        min="1"
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Timezone</label>
+                      <input
+                        type="text"
+                        value={editForm.timezone || ''}
+                        onChange={(e) => setEditForm({...editForm, timezone: e.target.value})}
+                        placeholder="e.g., Asia/Karachi"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Customer Information */}
+                <div className="form-section">
+                  <h4>Customer Information</h4>
+                  <div className="form-grid">
+                    <div className="form-group">
+                      <label>Customer Name</label>
+                      <input
+                        type="text"
+                        value={editForm.attendee?.name || ''}
+                        onChange={(e) => setEditForm({
+                          ...editForm, 
+                          attendee: {...editForm.attendee, name: e.target.value}
+                        })}
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Customer Email</label>
+                      <input
+                        type="email"
+                        value={editForm.attendee?.email || ''}
+                        onChange={(e) => setEditForm({
+                          ...editForm, 
+                          attendee: {...editForm.attendee, email: e.target.value}
+                        })}
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Scheduling */}
+                <div className="form-section">
+                  <h4>Scheduling</h4>
+                  <div className="form-grid">
+                    <div className="form-group">
+                      <label>Date & Time</label>
+                      <input
+                        type="datetime-local"
+                        value={editForm.scheduledTime || ''}
+                        onChange={(e) => setEditForm({...editForm, scheduledTime: e.target.value})}
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Status</label>
+                      <select
+                        value={editForm.status || 'scheduled'}
+                        onChange={(e) => setEditForm({...editForm, status: e.target.value})}
+                      >
+                        <option value="scheduled">Scheduled</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                        <option value="rescheduled">Rescheduled</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Admin Management */}
+                <div className="form-section">
+                  <h4>Admin Management</h4>
+                  <div className="form-grid">
+                    <div className="form-group full-width">
+                      <label>Admin Notes</label>
+                      <textarea
+                        value={editForm.adminNotes || ''}
+                        onChange={(e) => setEditForm({...editForm, adminNotes: e.target.value})}
+                        rows="3"
+                        placeholder="Internal notes about this booking..."
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={editForm.followUpSent || false}
+                          onChange={(e) => setEditForm({...editForm, followUpSent: e.target.checked})}
+                        />
+                        <span>Follow-up Sent</span>
+                      </label>
+                    </div>
+                    <div className="form-group">
+                      <label className="checkbox-label">
+                        <input
+                          type="checkbox"
+                          checked={editForm.reminderSent || false}
+                          onChange={(e) => setEditForm({...editForm, reminderSent: e.target.checked})}
+                        />
+                        <span>Reminder Sent</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Cancellation Reason (if cancelled) */}
+                {editForm.status === 'cancelled' && (
+                  <div className="form-section">
+                    <h4>Cancellation Details</h4>
+                    <div className="form-group full-width">
+                      <label>Cancellation Reason</label>
+                      <textarea
+                        value={editForm.cancellationReason || ''}
+                        onChange={(e) => setEditForm({...editForm, cancellationReason: e.target.value})}
+                        rows="2"
+                        placeholder="Reason for cancellation..."
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="modal-actions">
+                <button 
+                  type="button" 
+                  className="btn-secondary"
+                  onClick={() => setShowEditModal(false)}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="btn-primary"
+                  disabled={savingEdit}
+                >
+                  {savingEdit ? 'Saving...' : 'Save Changes'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
