@@ -1062,9 +1062,10 @@ router.get('/bookings', adminAuth, async (req, res) => {
     if (status) filter.status = status;
     if (search) {
       filter.$or = [
-        { customerName: { $regex: search, $options: 'i' } },
-        { customerEmail: { $regex: search, $options: 'i' } },
-        { serviceType: { $regex: search, $options: 'i' } }
+        { 'attendee.name': { $regex: search, $options: 'i' } },
+        { 'attendee.email': { $regex: search, $options: 'i' } },
+        { meetingTitle: { $regex: search, $options: 'i' } },
+        { meetingType: { $regex: search, $options: 'i' } }
       ];
     }
     
@@ -1242,7 +1243,7 @@ router.delete('/bookings/:id', adminAuth, async (req, res) => {
 router.get('/bookings-stats', adminAuth, async (req, res) => {
   try {
     const totalBookings = await Booking.countDocuments();
-    const pendingBookings = await Booking.countDocuments({ status: 'pending' });
+    const scheduledBookings = await Booking.countDocuments({ status: 'scheduled' });
     const confirmedBookings = await Booking.countDocuments({ status: 'confirmed' });
     const completedBookings = await Booking.countDocuments({ status: 'completed' });
     const cancelledBookings = await Booking.countDocuments({ status: 'cancelled' });
@@ -1275,7 +1276,7 @@ router.get('/bookings-stats', adminAuth, async (req, res) => {
       success: true,
       data: {
         total: totalBookings,
-        pending: pendingBookings,
+        scheduled: scheduledBookings,
         confirmed: confirmedBookings,
         completed: completedBookings,
         cancelled: cancelledBookings,

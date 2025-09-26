@@ -634,6 +634,25 @@
   color: var(--text-primary);
 }
 
+.meeting-link {
+  color: var(--primary-600);
+  text-decoration: none;
+  font-weight: 500;
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--primary-50);
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--primary-200);
+  transition: all var(--transition-normal);
+  display: inline-block;
+}
+
+.meeting-link:hover {
+  background: var(--primary-100);
+  border-color: var(--primary-300);
+  color: var(--primary-700);
+  transform: translateY(-1px);
+}
+
 /* Loading State */
 .loading-container {
   display: flex;

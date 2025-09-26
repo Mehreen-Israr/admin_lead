@@ -29,7 +29,7 @@ const BookingsPage = () => {
   // Status options
   const statusOptions = [
     { value: '', label: 'All Status' },
-    { value: 'pending', label: 'Pending' },
+    { value: 'scheduled', label: 'Scheduled' },
     { value: 'confirmed', label: 'Confirmed' },
     { value: 'completed', label: 'Completed' },
     { value: 'cancelled', label: 'Cancelled' },
@@ -39,9 +39,9 @@ const BookingsPage = () => {
   // Status colors
   const getStatusColor = (status) => {
     const colors = {
-      pending: '#f59e0b',
-      confirmed: '#3b82f6',
-      completed: '#10b981',
+      scheduled: '#3b82f6',
+      confirmed: '#10b981',
+      completed: '#059669',
       cancelled: '#ef4444',
       rescheduled: '#8b5cf6'
     };
@@ -150,22 +150,36 @@ const BookingsPage = () => {
 
   // Format date
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
+    if (!dateString) return 'Invalid Date';
+    try {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    } catch (error) {
+      return 'Invalid Date';
+    }
   };
 
   // Format time
-  const formatTime = (timeString) => {
-    return timeString;
+  const formatTime = (dateString) => {
+    if (!dateString) return 'Invalid Time';
+    try {
+      return new Date(dateString).toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    } catch (error) {
+      return 'Invalid Time';
+    }
   };
 
   // Get status badge
   const getStatusBadge = (status) => {
     const statusLabels = {
-      pending: 'Pending',
+      scheduled: 'Scheduled',
       confirmed: 'Confirmed',
       completed: 'Completed',
       cancelled: 'Cancelled',
@@ -230,8 +244,8 @@ const BookingsPage = () => {
             <i className="fas fa-clock"></i>
           </div>
           <div className="stat-content">
-            <div className="stat-value">{stats.pending || 0}</div>
-            <div className="stat-label">Pending</div>
+            <div className="stat-value">{stats.scheduled || 0}</div>
+            <div className="stat-label">Scheduled</div>
           </div>
         </div>
         <div className="stat-card">
@@ -330,13 +344,13 @@ const BookingsPage = () => {
                   <tr key={booking._id}>
                     <td>
                       <div className="customer-info">
-                        <div className="customer-name">{booking.customerName}</div>
-                        <div className="customer-email">{booking.customerEmail}</div>
+                        <div className="customer-name">{booking.attendee?.name || 'N/A'}</div>
+                        <div className="customer-email">{booking.attendee?.email || 'N/A'}</div>
                       </div>
                     </td>
                     <td>
                       <div className="service-info">
-                        <div className="service-type">{booking.serviceType}</div>
+                        <div className="service-type">{booking.meetingTitle || booking.meetingType || 'N/A'}</div>
                         {booking.duration && (
                           <div className="service-duration">{booking.duration} min</div>
                         )}
@@ -344,8 +358,8 @@ const BookingsPage = () => {
                     </td>
                     <td>
                       <div className="datetime-info">
-                        <div className="booking-date">{formatDate(booking.bookingDate)}</div>
-                        <div className="booking-time">{formatTime(booking.bookingTime)}</div>
+                        <div className="booking-date">{formatDate(booking.scheduledTime)}</div>
+                        <div className="booking-time">{formatTime(booking.scheduledTime)}</div>
                       </div>
                     </td>
                     <td>
@@ -353,13 +367,7 @@ const BookingsPage = () => {
                     </td>
                     <td>
                       <div className="price-info">
-                        {booking.price > 0 ? (
-                          <span className="price">
-                            {booking.currency || 'USD'} {booking.price}
-                          </span>
-                        ) : (
-                          <span className="no-price">Free</span>
-                        )}
+                        <span className="no-price">Free</span>
                       </div>
                     </td>
                     <td>
@@ -441,67 +449,87 @@ const BookingsPage = () => {
                   <div className="detail-grid">
                     <div className="detail-item">
                       <label>Name:</label>
-                      <span>{selectedBooking.customerName}</span>
+                      <span>{selectedBooking.attendee?.name || 'N/A'}</span>
                     </div>
                     <div className="detail-item">
                       <label>Email:</label>
-                      <span>{selectedBooking.customerEmail}</span>
+                      <span>{selectedBooking.attendee?.email || 'N/A'}</span>
                     </div>
-                    {selectedBooking.customerPhone && (
-                      <div className="detail-item">
-                        <label>Phone:</label>
-                        <span>{selectedBooking.customerPhone}</span>
-                      </div>
-                    )}
                   </div>
                 </div>
 
                 <div className="detail-section">
-                  <h4>Booking Information</h4>
+                  <h4>Meeting Information</h4>
                   <div className="detail-grid">
                     <div className="detail-item">
-                      <label>Service:</label>
-                      <span>{selectedBooking.serviceType}</span>
+                      <label>Meeting Type:</label>
+                      <span>{selectedBooking.meetingType || 'N/A'}</span>
+                    </div>
+                    <div className="detail-item">
+                      <label>Meeting Title:</label>
+                      <span>{selectedBooking.meetingTitle || 'N/A'}</span>
                     </div>
                     <div className="detail-item">
                       <label>Date:</label>
-                      <span>{formatDate(selectedBooking.bookingDate)}</span>
+                      <span>{formatDate(selectedBooking.scheduledTime)}</span>
                     </div>
                     <div className="detail-item">
                       <label>Time:</label>
-                      <span>{formatTime(selectedBooking.bookingTime)}</span>
+                      <span>{formatTime(selectedBooking.scheduledTime)}</span>
                     </div>
                     <div className="detail-item">
                       <label>Duration:</label>
                       <span>{selectedBooking.duration} minutes</span>
                     </div>
                     <div className="detail-item">
+                      <label>Timezone:</label>
+                      <span>{selectedBooking.timezone || 'N/A'}</span>
+                    </div>
+                    <div className="detail-item">
                       <label>Status:</label>
                       {getStatusBadge(selectedBooking.status)}
                     </div>
-                    {selectedBooking.price > 0 && (
-                      <div className="detail-item">
-                        <label>Price:</label>
-                        <span>{selectedBooking.currency || 'USD'} {selectedBooking.price}</span>
-                      </div>
-                    )}
                   </div>
                 </div>
 
-                {selectedBooking.location && (
+                {selectedBooking.meetingUrl && (
                   <div className="detail-section">
-                    <h4>Location</h4>
+                    <h4>Calendly Information</h4>
                     <div className="detail-grid">
                       <div className="detail-item">
-                        <label>Location:</label>
-                        <span>{selectedBooking.location}</span>
+                        <label>Meeting URL:</label>
+                        <a href={selectedBooking.meetingUrl} target="_blank" rel="noopener noreferrer" className="meeting-link">
+                          Join Meeting
+                        </a>
                       </div>
-                      {selectedBooking.address && (
+                      {selectedBooking.rescheduleUrl && (
                         <div className="detail-item">
-                          <label>Address:</label>
-                          <span>{selectedBooking.address}</span>
+                          <label>Reschedule URL:</label>
+                          <a href={selectedBooking.rescheduleUrl} target="_blank" rel="noopener noreferrer" className="meeting-link">
+                            Reschedule
+                          </a>
                         </div>
                       )}
+                      {selectedBooking.cancelUrl && (
+                        <div className="detail-item">
+                          <label>Cancel URL:</label>
+                          <a href={selectedBooking.cancelUrl} target="_blank" rel="noopener noreferrer" className="meeting-link">
+                            Cancel
+                          </a>
+                        </div>
+                      )}
+                      <div className="detail-item">
+                        <label>Lead Source:</label>
+                        <span>{selectedBooking.leadSource || 'N/A'}</span>
+                      </div>
+                      <div className="detail-item">
+                        <label>Follow-up Sent:</label>
+                        <span>{selectedBooking.followUpSent ? 'Yes' : 'No'}</span>
+                      </div>
+                      <div className="detail-item">
+                        <label>Reminder Sent:</label>
+                        <span>{selectedBooking.reminderSent ? 'Yes' : 'No'}</span>
+                      </div>
                     </div>
                   </div>
                 )}
