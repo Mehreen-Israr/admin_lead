@@ -837,29 +837,35 @@
     text-align: center;
     gap: var(--space-sm);
     margin-bottom: var(--space-md);
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--border-secondary);
   }
   
   .contact-avatar {
     order: 1;
-    width: 48px;
-    height: 48px;
-    font-size: 1.2rem;
+    width: 56px;
+    height: 56px;
+    font-size: 1.4rem;
+    margin-bottom: var(--space-xs);
   }
   
   .contact-basic-info {
     order: 2;
     text-align: center;
+    width: 100%;
   }
   
   .contact-name {
-    font-size: 1.1rem;
-    font-weight: 600;
+    font-size: 1.2rem;
+    font-weight: 700;
     margin-bottom: var(--space-xs);
+    color: var(--text-primary);
   }
   
   .contact-date {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     color: var(--text-secondary);
+    margin-bottom: var(--space-xs);
   }
   
   .contact-status {
@@ -876,9 +882,10 @@
     flex-direction: column;
     align-items: flex-start;
     gap: var(--space-xs);
-    padding: var(--space-sm);
+    padding: var(--space-md);
     background: var(--bg-secondary);
-    border-radius: var(--border-radius-sm);
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--border-primary);
   }
   
   .info-icon {
@@ -890,30 +897,37 @@
   }
   
   .info-label {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--accent-primary);
     margin-bottom: var(--space-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
   
   .info-value {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     color: var(--text-primary);
-    word-break: break-all;
+    word-break: break-word;
+    line-height: 1.4;
   }
   
   .contact-actions {
     flex-direction: column;
     gap: var(--space-sm);
     margin-top: var(--space-md);
+    padding-top: var(--space-sm);
+    border-top: 1px solid var(--border-secondary);
   }
   
   .action-btn {
     width: 100%;
-    padding: var(--space-sm) var(--space-md);
-    font-size: 0.9rem;
-    min-height: 44px;
+    padding: var(--space-md) var(--space-lg);
+    font-size: 0.95rem;
+    min-height: 48px;
     justify-content: center;
+    font-weight: 600;
+    border-radius: var(--border-radius-md);
   }
 }
 
