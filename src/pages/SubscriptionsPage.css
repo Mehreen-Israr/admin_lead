@@ -224,11 +224,16 @@
   }
 }
 
+/* Search Bar Spacing */
+.contacts-controls {
+  margin-bottom: 2rem !important;
+}
+
 /* Modal Styles for Edit/Create Package */
 .modal-overlay {
   position: fixed !important;
   inset: 0 !important;
-  background: rgba(15, 15, 35, 0.9) !important;
+  background: rgba(26, 26, 46, 0.95) !important;
   display: flex !important;
   align-items: flex-start !important;
   justify-content: center !important;
@@ -253,15 +258,7 @@
 }
 
 .modal-card::before {
-  content: '';
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(245, 158, 11, 0.08) 100%) !important;
-  border-radius: 16px !important;
-  pointer-events: none !important;
+  display: none !important;
 }
 
 .modal-card h3 {
