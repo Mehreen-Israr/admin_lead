@@ -333,9 +333,15 @@
 }
 
 .modal-card .form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 16px !important;
+  align-items: start !important;
+}
+
+.modal-card .form-row:has(.checkbox-group) {
+  grid-template-columns: 1fr auto !important;
+  align-items: center !important;
 }
 
 .modal-card .form-row.full-width {
@@ -343,23 +349,39 @@
 }
 
 .modal-card .checkbox-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 8px;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  margin-top: 0 !important;
+  padding: 12px 16px !important;
+  background: rgba(0, 0, 0, 0.2) !important;
+  border: 1px solid #fbbf24 !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease !important;
+}
+
+.modal-card .checkbox-group:hover {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border-color: #fcd34d !important;
 }
 
 .modal-card .checkbox-group input[type="checkbox"] {
-  width: auto;
-  margin: 0;
+  width: 20px !important;
+  height: 20px !important;
+  margin: 0 !important;
+  accent-color: #fbbf24 !important;
+  cursor: pointer !important;
 }
 
 .modal-card .checkbox-group label {
-  margin: 0;
-  font-size: 0.9rem;
-  text-transform: none;
-  letter-spacing: normal;
-  color: var(--text-primary);
+  margin: 0 !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  color: #fbbf24 !important;
+  cursor: pointer !important;
+  user-select: none !important;
 }
 
 .modal-card .form-actions {
