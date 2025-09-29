@@ -751,16 +751,16 @@
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  color: #000000;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   position: relative;
   z-index: 1;
 }
 
 .close-btn {
-  background: rgba(0, 0, 0, 0.3);
-  border: 2px solid rgba(0, 0, 0, 0.2);
-  color: #000000;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  border: 2px solid #dc2626;
+  color: #ffffff;
   font-size: 1.8rem;
   cursor: pointer;
   padding: 0.5rem;
@@ -774,13 +774,14 @@
   font-weight: 700;
   position: relative;
   z-index: 1;
+  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);
 }
 
 .close-btn:hover {
-  background: rgba(0, 0, 0, 0.5);
-  border-color: rgba(0, 0, 0, 0.4);
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  border-color: #b91c1c;
   transform: rotate(90deg) scale(1.1);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 8px rgba(220, 38, 38, 0.4);
 }
 
 .modal-body {
@@ -1056,6 +1057,44 @@
     padding: 0.6rem 1.5rem;
     font-size: 0.9rem;
   }
+  
+  /* Mobile Table Styles */
+  .users-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .users-table {
+    min-width: 600px;
+  }
+  
+  .users-table th {
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+  
+  .users-table td {
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.85rem;
+  }
+  
+  .user-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+  
+  .action-buttons {
+    gap: var(--space-xs);
+  }
+  
+  .btn-view,
+  .btn-delete {
+    width: 36px;
+    height: 36px;
+    font-size: 0.9rem;
+  }
 }
 
 /* Comprehensive Mobile Responsive Design */
@@ -1144,10 +1183,13 @@
 @media (max-width: 480px) {
   .users-page {
     padding: 0.75rem;
+    padding-top: calc(var(--header-height) + 1rem);
   }
   
-  .users-title {
-    font-size: 1.75rem;
+  .page-header h1 {
+    font-size: 2rem;
+    line-height: 1.1;
+    margin-bottom: var(--space-sm);
   }
   
   .stat-card {

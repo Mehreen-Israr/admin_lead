@@ -548,37 +548,41 @@
   }
 
   .user-info {
-    display: flex; /* keep user info visible */
+    display: flex !important; /* force show user info on mobile */
     flex-direction: column;
     align-items: flex-start;
     gap: 0;
-    min-width: 0; /* allow text to shrink */
+    min-width: 0;
+    max-width: 120px;
   }
-
+  
   .user-avatar {
-    width: 28px;
-    height: 28px;
-    font-size: 0.8rem;
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
     flex-shrink: 0;
   }
-
+  
   .user-name {
-    font-size: 0.7rem;
-    line-height: 1;
+    font-size: 0.75rem;
+    line-height: 1.1;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 80px;
+    max-width: 100px;
+    font-weight: 600;
+    color: var(--text-primary);
   }
-
+  
   .user-role {
-    font-size: 0.6rem;
-    line-height: 1;
-    opacity: 0.8;
+    font-size: 0.7rem;
+    line-height: 1.1;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 80px;
+    max-width: 100px;
+    color: var(--text-secondary);
+    font-weight: 500;
   }
 
   .header-breadcrumb {
