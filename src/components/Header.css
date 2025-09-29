@@ -549,40 +549,33 @@
 
   .user-info {
     display: flex !important; /* force show user info on mobile */
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-sm);
     min-width: 0;
-    max-width: 120px;
+    max-width: 140px;
   }
   
   .user-avatar {
-    width: 32px;
-    height: 32px;
-    font-size: 0.9rem;
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
     flex-shrink: 0;
   }
   
   .user-name {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     line-height: 1.1;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 100px;
+    max-width: 80px;
     font-weight: 600;
     color: var(--text-primary);
   }
   
   .user-role {
-    font-size: 0.7rem;
-    line-height: 1.1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100px;
-    color: var(--text-secondary);
-    font-weight: 500;
+    display: none; /* hide role text on very small screens */
   }
 
   .header-breadcrumb {
