@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { fetchPackages, createPackage, updatePackage, deletePackage } from '../services/api';
 import './ContactsPage.css';
+import './SubscriptionsPage.css';
 
 const defaultForm = {
   name: '',
