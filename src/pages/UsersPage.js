@@ -163,15 +163,17 @@ const UsersPage = () => {
                         className="btn-view" 
                         onClick={() => handleViewUser(user._id)}
                         disabled={loadingUser}
+                        title="View User Details"
                       >
-                        {loadingUser ? 'Loading...' : 'View'}
+                        <i className={`fas ${loadingUser ? 'fa-spinner fa-spin' : 'fa-eye'}`}></i>
                       </button>
                       <button 
                         className="btn-delete" 
                         onClick={() => handleDeleteUser(user._id, user.name)}
                         disabled={deletingUserId === user._id}
+                        title="Delete User"
                       >
-                        {deletingUserId === user._id ? 'Deleting...' : 'Delete'}
+                        <i className={`fas ${deletingUserId === user._id ? 'fa-spinner fa-spin' : 'fa-trash'}`}></i>
                       </button>
                     </div>
                   </td>
