@@ -255,16 +255,29 @@ const SubscriptionsPage = () => {
                       )}
                     </div>
                   </div>
-                  <div className="contact-actions" style={{justifyContent:'space-between'}}>
-                    <div style={{display:'flex',gap:'8px'}}>
+                  <div className="contact-actions" style={{justifyContent:'space-between', alignItems:'flex-start', minHeight:'60px'}}>
+                    <div style={{display:'flex',gap:'8px', flexWrap:'wrap'}}>
                       <button className="refresh-btn" onClick={() => startEdit(pkg)}>
                         <i className="fas fa-pen" /> Edit
                       </button>
-                      <button className="refresh-btn" style={{borderColor:'rgba(239,68,68,0.35)', color:'#f87171'}} onClick={() => onDelete(pkg._id)}>
+                      <button 
+                        className="refresh-btn" 
+                        style={{
+                          borderColor:'#dc2626', 
+                          color:'#ffffff',
+                          backgroundColor:'#dc2626',
+                          minWidth:'80px',
+                          display:'flex',
+                          alignItems:'center',
+                          justifyContent:'center',
+                          fontWeight:'600'
+                        }} 
+                        onClick={() => onDelete(pkg._id)}
+                      >
                         <i className="fas fa-trash" /> Delete
                       </button>
                     </div>
-                    <div style={{opacity:0.85,fontSize:'0.85rem',color:'var(--text-tertiary)'}}>
+                    <div style={{opacity:0.85,fontSize:'0.85rem',color:'var(--text-tertiary)', marginTop:'8px'}}>
                       <i className="fas fa-clock" /> Updated {new Date(pkg.updatedAt || pkg.createdAt).toLocaleDateString()}
                     </div>
                   </div>

@@ -277,7 +277,10 @@
   transition: all var(--transition-normal);
   backdrop-filter: blur(10px);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
 }
 
 .contact-card::before {
@@ -456,6 +459,9 @@
   display: flex;
   gap: var(--space-sm);
   align-items: center;
+  margin-top: auto;
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border-secondary);
 }
 
 .btn-reply, .btn-archive {
@@ -782,6 +788,23 @@
     padding: 0.4rem 0.6rem;
     font-size: 0.8rem;
   }
+}
+
+/* Delete Button Styling */
+.refresh-btn[style*="color:#ffffff"] {
+  background: #dc2626 !important;
+  border-color: #dc2626 !important;
+  color: #ffffff !important;
+  font-weight: 600;
+  transition: all var(--transition-normal);
+}
+
+.refresh-btn[style*="color:#ffffff"]:hover {
+  background: #b91c1c !important;
+  border-color: #b91c1c !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
 }
 
 /* Reply Modal Styles */
