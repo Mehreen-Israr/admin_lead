@@ -289,10 +289,10 @@ const SubscriptionsPage = () => {
       )}
 
       {showForm && (
-        <div className="modal-overlay" style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',display:'flex',alignItems:'flex-start',justifyContent:'center',zIndex:1000,overflowY:'auto',padding:'32px 16px'}}>
-          <div className="modal-card" style={{background:'var(--bg-card)',border:'1px solid var(--border-primary)',borderRadius:'12px',padding:'24px',width:'min(680px, 92vw)',maxHeight:'90vh',overflowY:'auto'}}>
-            <h3 style={{marginTop:0}}>{editingId ? 'Edit Package' : 'Create Package'}</h3>
-            <form onSubmit={onSubmit} style={{display:'grid',gap:'12px'}}>
+        <div className="modal-overlay">
+          <div className="modal-card">
+            <h3>{editingId ? 'Edit Package' : 'Create Package'}</h3>
+            <form onSubmit={onSubmit}>
               <div>
                 <label>Name</label>
                 <input className="search-input" value={form.name} onChange={(e)=>setForm({...form,name:e.target.value})} required />
@@ -313,22 +313,23 @@ const SubscriptionsPage = () => {
                 <label>Logo URL</label>
                 <input className="search-input" value={form.logo} onChange={(e)=>setForm({...form,logo:e.target.value})} />
               </div>
-              <div style={{display:'grid',gridTemplateColumns:'1fr 120px',gap:'12px'}}>
+              <div className="form-row">
                 <input className="search-input" type="number" step="0.01" placeholder="Price" value={form.pricing.amount} onChange={(e)=>setForm({...form,pricing:{...form.pricing,amount:e.target.value}})} />
                 <input className="search-input" placeholder="Currency" value={form.pricing.currency} onChange={(e)=>setForm({...form,pricing:{...form.pricing,currency:e.target.value}})} />
               </div>
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'12px'}}>
+              <div className="form-row">
                 <input className="search-input" placeholder="Discount (e.g. 40% OFF)" value={form.pricing.discount} onChange={(e)=>setForm({...form,pricing:{...form.pricing,discount:e.target.value}})} />
-                <label style={{display:'flex',alignItems:'center',gap:'8px'}}>
-                  <input type="checkbox" checked={form.pricing.popular} onChange={(e)=>setForm({...form,pricing:{...form.pricing,popular:e.target.checked}})} /> Popular
-                </label>
+                <div className="checkbox-group">
+                  <input type="checkbox" checked={form.pricing.popular} onChange={(e)=>setForm({...form,pricing:{...form.pricing,popular:e.target.checked}})} />
+                  <label>Popular</label>
+                </div>
                 <input className="search-input" type="number" placeholder="Trial Days" value={form.pricing.trialDays} onChange={(e)=>setForm({...form,pricing:{...form.pricing,trialDays:e.target.value}})} />
               </div>
               <div>
                 <label>Image URL (optional, fallback)</label>
                 <input className="search-input" value={form.imageUrl} onChange={(e)=>setForm({...form,imageUrl:e.target.value})} />
               </div>
-              <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+              <div className="checkbox-group">
                 <input id="isActive" type="checkbox" checked={form.isActive} onChange={(e)=>setForm({...form,isActive:e.target.checked})} />
                 <label htmlFor="isActive">Active</label>
               </div>
@@ -336,9 +337,9 @@ const SubscriptionsPage = () => {
                 <label>Sort Order</label>
                 <input className="search-input" type="number" value={form.sortOrder} onChange={(e)=>setForm({...form,sortOrder:e.target.value})} />
               </div>
-              <div style={{display:'flex',gap:'8px',justifyContent:'flex-end',marginTop:'8px'}}>
-                <button type="button" className="action-btn btn-tertiary" onClick={()=>setShowForm(false)}>Cancel</button>
-                <button type="submit" className="action-btn btn-primary" disabled={saving}>{saving ? 'Saving...' : 'Save'}</button>
+              <div className="form-actions">
+                <button type="button" className="btn-cancel" onClick={()=>setShowForm(false)}>Cancel</button>
+                <button type="submit" className="btn-save" disabled={saving}>{saving ? 'Saving...' : 'Save'}</button>
               </div>
             </form>
           </div>
