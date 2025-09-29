@@ -239,7 +239,7 @@
 }
 
 .modal-card {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
+  background: #1a1a2e !important;
   border: 3px solid #fbbf24 !important;
   border-radius: 16px !important;
   padding: 32px !important;
