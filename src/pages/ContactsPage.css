@@ -767,6 +767,31 @@
   
   .stats-grid {
     grid-template-columns: 1fr;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+  }
+  
+  .stat-card {
+    padding: var(--space-lg);
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: var(--space-xs);
+  }
+  
+  .stat-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
   
   .contact-header {
