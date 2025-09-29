@@ -228,7 +228,7 @@
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(15, 15, 35, 0.8);
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -239,8 +239,8 @@
 }
 
 .modal-card {
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-  border: 2px solid #d4af37;
+  background: var(--bg-card);
+  border: 2px solid var(--accent-primary);
   border-radius: 16px;
   padding: 32px;
   width: min(680px, 92vw);
@@ -248,6 +248,7 @@
   overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
   position: relative;
+  backdrop-filter: blur(10px);
 }
 
 .modal-card::before {
@@ -257,7 +258,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(244, 228, 166, 0.05) 100%);
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%);
   border-radius: 16px;
   pointer-events: none;
 }
@@ -268,7 +269,7 @@
   font-family: 'Oswald', sans-serif;
   font-size: 1.8rem;
   font-weight: 600;
-  color: #d4af37;
+  color: var(--accent-primary);
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 1px;
@@ -286,7 +287,7 @@
 .modal-card label {
   display: block;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text-primary);
   font-size: 0.9rem;
   margin-bottom: 6px;
   text-transform: uppercase;
@@ -298,10 +299,10 @@
 .modal-card textarea {
   width: 100%;
   padding: 12px 16px;
-  border: 2px solid #444444;
+  border: 2px solid var(--border-primary);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  background: var(--bg-glass);
+  color: var(--text-primary);
   font-size: 1rem;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
@@ -311,14 +312,14 @@
 .modal-card select:focus,
 .modal-card textarea:focus {
   outline: none;
-  border-color: #d4af37;
-  background: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+  border-color: var(--accent-primary);
+  background: var(--bg-card-hover);
+  box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.2);
 }
 
 .modal-card input::placeholder,
 .modal-card textarea::placeholder {
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-secondary);
 }
 
 .modal-card textarea {
@@ -355,6 +356,7 @@
   font-size: 0.9rem;
   text-transform: none;
   letter-spacing: normal;
+  color: var(--text-primary);
 }
 
 .modal-card .form-actions {
@@ -363,13 +365,13 @@
   justify-content: flex-end;
   margin-top: 24px;
   padding-top: 20px;
-  border-top: 1px solid rgba(212, 175, 55, 0.3);
+  border-top: 1px solid var(--border-accent);
 }
 
 .modal-card .btn-save {
   padding: 12px 24px;
-  background: linear-gradient(135deg, #d4af37, #b8941f);
-  color: #000000;
+  background: linear-gradient(135deg, var(--accent-primary), var(--primary-600));
+  color: var(--bg-primary);
   border: none;
   border-radius: 8px;
   font-size: 1rem;
@@ -381,16 +383,16 @@
 }
 
 .modal-card .btn-save:hover {
-  background: linear-gradient(135deg, #f4e4a6, #d4af37);
+  background: linear-gradient(135deg, var(--primary-300), var(--accent-primary));
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+  box-shadow: 0 8px 25px rgba(251, 191, 36, 0.4);
 }
 
 .modal-card .btn-cancel {
   padding: 12px 24px;
   background: transparent;
-  color: #ffffff;
-  border: 2px solid #666666;
+  color: var(--text-primary);
+  border: 2px solid var(--border-primary);
   border-radius: 8px;
   font-size: 1rem;
   font-weight: 600;
@@ -401,9 +403,9 @@
 }
 
 .modal-card .btn-cancel:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: #d4af37;
-  color: #d4af37;
+  background: var(--bg-glass);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
 }
 
 /* Mobile Modal Styles */

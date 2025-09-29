@@ -1016,30 +1016,173 @@
     font-size: 0.85rem;
     margin-bottom: var(--space-xs);
     display: block;
+    font-weight: 600;
+    color: var(--text-primary);
   }
   
   .email-input, .email-textarea {
-    padding: var(--space-sm) var(--space-md);
-    font-size: 0.9rem;
+    padding: 14px 16px; /* Increased padding for better touch targets */
+    font-size: 16px; /* Prevent zoom on iOS */
     border-radius: var(--border-radius-sm);
-    min-height: 44px; /* Touch-friendly height */
+    min-height: 48px; /* Larger touch target */
+    border: 2px solid var(--border-primary);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    width: 100%;
+    box-sizing: border-box;
+    transition: all var(--transition-normal);
+  }
+  
+  .email-input:focus, .email-textarea:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    background: var(--bg-card);
+    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.2);
   }
   
   .email-textarea {
     min-height: 120px;
-    line-height: 1.4;
+    line-height: 1.5;
+    resize: vertical;
   }
   
   .modal-actions {
     flex-direction: column;
     gap: var(--space-sm);
+    margin-top: var(--space-lg);
   }
   
   .modal-actions .btn-primary,
   .modal-actions .btn-secondary {
     width: 100%;
-    padding: var(--space-md);
-    font-size: 0.9rem;
-    min-height: 44px;
+    padding: 16px 20px; /* Larger padding for better touch */
+    font-size: 1rem;
+    min-height: 48px; /* Larger touch target */
+    font-weight: 600;
+    border-radius: var(--border-radius-md);
+    transition: all var(--transition-normal);
+  }
+  
+  /* Search input mobile improvements */
+  .search-input {
+    padding: 14px 16px 14px 3rem; /* Increased padding */
+    font-size: 16px; /* Prevent zoom on iOS */
+    min-height: 48px; /* Larger touch target */
+    border: 2px solid var(--border-primary);
+    border-radius: var(--border-radius-md);
+  }
+  
+  .search-input:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.2);
+  }
+  
+  /* Form container improvements */
+  .email-details {
+    padding: var(--space-lg);
+    background: var(--bg-card);
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--border-primary);
+    margin-bottom: var(--space-lg);
+  }
+  
+  /* Better spacing for mobile */
+  .modal-card {
+    padding: var(--space-lg);
+    margin: var(--space-md);
+  }
+  
+  .modal-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: var(--space-lg);
+    text-align: center;
+  }
+  
+  /* Page controls mobile improvements */
+  .page-controls {
+    flex-direction: column;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+  }
+  
+  .search-container {
+    width: 100%;
+    position: relative;
+  }
+  
+  .search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    z-index: 2;
+  }
+  
+  .clear-search-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    transition: all var(--transition-normal);
+    z-index: 2;
+  }
+  
+  .clear-search-btn:hover {
+    background: var(--bg-glass);
+    color: var(--text-primary);
+  }
+  
+  .refresh-btn {
+    width: 100%;
+    padding: 16px 20px;
+    font-size: 1rem;
+    min-height: 48px;
+    font-weight: 600;
+    border-radius: var(--border-radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+  }
+  
+  /* Tab navigation mobile improvements */
+  .tab-navigation {
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+  }
+  
+  .tab-btn {
+    width: 100%;
+    padding: 16px 20px;
+    font-size: 1rem;
+    min-height: 48px;
+    font-weight: 600;
+    border-radius: var(--border-radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    transition: all var(--transition-normal);
+  }
+  
+  .tab-btn.active {
+    background: linear-gradient(135deg, var(--accent-primary), var(--primary-600));
+    color: var(--bg-primary);
+    border: 2px solid var(--accent-primary);
+  }
+  
+  .tab-btn:not(.active) {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 2px solid var(--border-primary);
   }
 }
