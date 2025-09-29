@@ -1185,4 +1185,75 @@
     color: var(--text-primary);
     border: 2px solid var(--border-primary);
   }
+  
+  /* Force mobile styles with !important for deployment */
+  .email-input, .email-textarea {
+    padding: 14px 16px !important;
+    font-size: 16px !important;
+    min-height: 48px !important;
+    border: 2px solid var(--border-primary) !important;
+    background: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .search-input {
+    padding: 14px 16px 14px 3rem !important;
+    font-size: 16px !important;
+    min-height: 48px !important;
+    border: 2px solid var(--border-primary) !important;
+  }
+  
+  .refresh-btn {
+    width: 100% !important;
+    padding: 16px 20px !important;
+    font-size: 1rem !important;
+    min-height: 48px !important;
+  }
+  
+  .tab-btn {
+    width: 100% !important;
+    padding: 16px 20px !important;
+    font-size: 1rem !important;
+    min-height: 48px !important;
+  }
+  
+  .modal-actions .btn-primary,
+  .modal-actions .btn-secondary {
+    width: 100% !important;
+    padding: 16px 20px !important;
+    font-size: 1rem !important;
+    min-height: 48px !important;
+  }
+  
+  /* Additional mobile overrides */
+  .page-controls {
+    flex-direction: column !important;
+    gap: var(--space-md) !important;
+  }
+  
+  .search-container {
+    width: 100% !important;
+  }
+  
+  .tab-navigation {
+    flex-direction: column !important;
+    gap: var(--space-sm) !important;
+  }
+  
+  /* Force mobile layout for all form elements */
+  .email-details {
+    padding: var(--space-lg) !important;
+    background: var(--bg-card) !important;
+    border-radius: var(--border-radius-lg) !important;
+    border: 1px solid var(--border-primary) !important;
+  }
+  
+  .modal-card {
+    padding: var(--space-lg) !important;
+    margin: var(--space-md) !important;
+    width: calc(100vw - 2rem) !important;
+    max-width: none !important;
+  }
 }

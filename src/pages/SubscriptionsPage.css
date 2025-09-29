@@ -440,4 +440,49 @@
     width: 100%;
     padding: 14px 20px;
   }
+  
+  /* Force mobile modal styles */
+  .modal-card {
+    background: var(--bg-card) !important;
+    border: 2px solid var(--accent-primary) !important;
+    backdrop-filter: blur(10px) !important;
+  }
+  
+  .modal-card h3 {
+    color: var(--accent-primary) !important;
+  }
+  
+  .modal-card input,
+  .modal-card select,
+  .modal-card textarea {
+    background: var(--bg-glass) !important;
+    border: 2px solid var(--border-primary) !important;
+    color: var(--text-primary) !important;
+    padding: 14px 16px !important;
+    font-size: 16px !important;
+    min-height: 48px !important;
+  }
+  
+  .modal-card input:focus,
+  .modal-card select:focus,
+  .modal-card textarea:focus {
+    border-color: var(--accent-primary) !important;
+    background: var(--bg-card-hover) !important;
+    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.2) !important;
+  }
+  
+  .modal-card label {
+    color: var(--text-primary) !important;
+  }
+  
+  .modal-card .btn-save {
+    background: linear-gradient(135deg, var(--accent-primary), var(--primary-600)) !important;
+    color: var(--bg-primary) !important;
+  }
+  
+  .modal-card .btn-cancel {
+    background: transparent !important;
+    color: var(--text-primary) !important;
+    border: 2px solid var(--border-primary) !important;
+  }
 }
