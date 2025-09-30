@@ -246,23 +246,89 @@ const UsersPage = () => {
 
                 {selectedUser.role !== 'admin' && (
                   <div className="detail-section">
-                    <h3>Packages & Services</h3>
-                    <div className="packages-info">
-                      <p className="coming-soon">Package information will be available in future updates</p>
-                      <div className="package-placeholder">
-                        <div className="package-item">
-                          <label>Active Packages:</label>
-                          <span className="placeholder">Coming Soon</span>
+                    <h3>Subscription Information</h3>
+                    <div className="subscription-info">
+                      {selectedUser.subscription ? (
+                        <div className="subscription-details">
+                          <div className="subscription-header">
+                            <div className="subscription-status">
+                              <span className={`status-badge ${selectedUser.subscription.status}`}>
+                                {selectedUser.subscription.status?.charAt(0).toUpperCase() + selectedUser.subscription.status?.slice(1)}
+                              </span>
+                            </div>
+                            <div className="subscription-plan">
+                              <strong>{selectedUser.subscription.plan?.charAt(0).toUpperCase() + selectedUser.subscription.plan?.slice(1)} Plan</strong>
+                            </div>
+                          </div>
+                          
+                          <div className="detail-grid">
+                            <div className="detail-item">
+                              <label>Package Name:</label>
+                              <span>{selectedUser.subscription.packageName || 'N/A'}</span>
+                            </div>
+                            <div className="detail-item">
+                              <label>Plan:</label>
+                              <span className="plan-badge">{selectedUser.subscription.plan || 'N/A'}</span>
+                            </div>
+                            <div className="detail-item">
+                              <label>Status:</label>
+                              <span className={`status ${selectedUser.subscription.status}`}>
+                                {selectedUser.subscription.status?.charAt(0).toUpperCase() + selectedUser.subscription.status?.slice(1)}
+                              </span>
+                            </div>
+                            <div className="detail-item">
+                              <label>Current Period Start:</label>
+                              <span>{selectedUser.subscription.currentPeriodStart ? new Date(selectedUser.subscription.currentPeriodStart).toLocaleDateString() : 'N/A'}</span>
+                            </div>
+                            <div className="detail-item">
+                              <label>Current Period End:</label>
+                              <span>{selectedUser.subscription.currentPeriodEnd ? new Date(selectedUser.subscription.currentPeriodEnd).toLocaleDateString() : 'N/A'}</span>
+                            </div>
+                            {selectedUser.subscription.trialStart && (
+                              <div className="detail-item">
+                                <label>Trial Start:</label>
+                                <span>{new Date(selectedUser.subscription.trialStart).toLocaleDateString()}</span>
+                              </div>
+                            )}
+                            {selectedUser.subscription.trialEnd && (
+                              <div className="detail-item">
+                                <label>Trial End:</label>
+                                <span>{new Date(selectedUser.subscription.trialEnd).toLocaleDateString()}</span>
+                              </div>
+                            )}
+                            <div className="detail-item">
+                              <label>Cancel at Period End:</label>
+                              <span className={selectedUser.subscription.cancelAtPeriodEnd ? 'cancel-warning' : 'no-cancel'}>
+                                {selectedUser.subscription.cancelAtPeriodEnd ? 'Yes' : 'No'}
+                              </span>
+                            </div>
+                            <div className="detail-item">
+                              <label>Stripe Customer ID:</label>
+                              <span className="stripe-id">{selectedUser.subscription.stripeCustomerId || 'N/A'}</span>
+                            </div>
+                            <div className="detail-item">
+                              <label>Stripe Subscription ID:</label>
+                              <span className="stripe-id">{selectedUser.subscription.stripeSubscriptionId || 'N/A'}</span>
+                            </div>
+                            <div className="detail-item">
+                              <label>Subscription Created:</label>
+                              <span>{selectedUser.subscription.createdAt ? new Date(selectedUser.subscription.createdAt).toLocaleString() : 'N/A'}</span>
+                            </div>
+                            <div className="detail-item">
+                              <label>Last Updated:</label>
+                              <span>{selectedUser.subscription.updatedAt ? new Date(selectedUser.subscription.updatedAt).toLocaleString() : 'N/A'}</span>
+                            </div>
+                          </div>
                         </div>
-                        <div className="package-item">
-                          <label>Subscription Status:</label>
-                          <span className="placeholder">Coming Soon</span>
+                      ) : (
+                        <div className="no-subscription">
+                          <div className="no-subscription-icon">
+                            <i className="fas fa-times-circle"></i>
+                          </div>
+                          <p className="no-subscription-text">No subscription found</p>
+                          <p className="no-subscription-description">This user hasn't subscribed to any packages yet.</p>
                         </div>
-                        <div className="package-item">
-                          <label>Package History:</label>
-                          <span className="placeholder">Coming Soon</span>
-                        </div>
-                      </div>
+                      )}
                     </div>
                   </div>
                 )}

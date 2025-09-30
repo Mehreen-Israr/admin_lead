@@ -1223,6 +1223,254 @@
   }
 }
 
+/* Subscription Information Styles */
+.subscription-info {
+  margin-top: var(--space-md);
+}
+
+.subscription-details {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--border-radius-lg);
+  padding: var(--space-lg);
+  margin-top: var(--space-md);
+}
+
+.subscription-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--border-secondary);
+}
+
+.subscription-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.status-badge {
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--border-radius-sm);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.active {
+  background: rgba(34, 197, 94, 0.1);
+  color: var(--success-600);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.status-badge.trialing {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--primary-600);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.status-badge.canceled {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error-600);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.status-badge.past_due {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--warning-600);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.subscription-plan {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.plan-badge {
+  background: linear-gradient(135deg, var(--primary-500), var(--accent-500));
+  color: white;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--border-radius-sm);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status.active {
+  color: var(--success-600);
+  font-weight: 600;
+}
+
+.status.trialing {
+  color: var(--primary-600);
+  font-weight: 600;
+}
+
+.status.canceled {
+  color: var(--error-600);
+  font-weight: 600;
+}
+
+.status.past_due {
+  color: var(--warning-600);
+  font-weight: 600;
+}
+
+.cancel-warning {
+  color: var(--error-600);
+  font-weight: 600;
+}
+
+.no-cancel {
+  color: var(--success-600);
+  font-weight: 600;
+}
+
+.stripe-id {
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  background: var(--bg-tertiary);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--border-secondary);
+  word-break: break-all;
+}
+
+/* No Subscription State */
+.no-subscription {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3xl) var(--space-lg);
+  text-align: center;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--border-radius-lg);
+  margin-top: var(--space-md);
+}
+
+.no-subscription-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-lg);
+}
+
+.no-subscription-icon i {
+  font-size: 2rem;
+  color: var(--text-tertiary);
+}
+
+.no-subscription-text {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--space-sm) 0;
+}
+
+.no-subscription-description {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Mobile Responsive for Subscription */
+@media (max-width: 768px) {
+  .subscription-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-sm);
+  }
+  
+  .subscription-status {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  
+  .subscription-plan {
+    font-size: 1rem;
+  }
+  
+  .subscription-details {
+    padding: var(--space-md);
+  }
+  
+  .stripe-id {
+    font-size: 0.8rem;
+    word-break: break-all;
+  }
+  
+  .no-subscription {
+    padding: var(--space-xl) var(--space-md);
+  }
+  
+  .no-subscription-icon {
+    width: 56px;
+    height: 56px;
+  }
+  
+  .no-subscription-icon i {
+    font-size: 1.8rem;
+  }
+  
+  .no-subscription-text {
+    font-size: 1.1rem;
+  }
+  
+  .no-subscription-description {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .subscription-details {
+    padding: var(--space-sm);
+  }
+  
+  .subscription-header {
+    margin-bottom: var(--space-md);
+    padding-bottom: var(--space-sm);
+  }
+  
+  .status-badge {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+  }
+  
+  .plan-badge {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+  }
+  
+  .stripe-id {
+    font-size: 0.75rem;
+    padding: 4px 6px;
+  }
+  
+  .no-subscription {
+    padding: var(--space-lg) var(--space-sm);
+  }
+  
+  .no-subscription-icon {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .no-subscription-icon i {
+    font-size: 1.5rem;
+  }
+}
+
 /* Page Controls */
 .page-controls {
   display: flex;
