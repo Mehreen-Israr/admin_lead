@@ -475,3 +475,174 @@
     padding: 16px 24px !important;
   }
 }
+
+/* Pricing Plans Section Styles */
+.pricing-section {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--border-radius-lg);
+  padding: var(--space-lg);
+  margin: var(--space-md) 0;
+}
+
+.pricing-section h4 {
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0 0 var(--space-lg) 0;
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--border-secondary);
+}
+
+.pricing-plan {
+  background: var(--bg-card);
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--border-radius-md);
+  padding: var(--space-md);
+  margin-bottom: var(--space-md);
+  transition: all var(--transition-normal);
+}
+
+.pricing-plan:hover {
+  border-color: var(--primary-200);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.pricing-plan:last-child {
+  margin-bottom: 0;
+}
+
+.plan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--border-secondary);
+}
+
+.plan-header h5 {
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.plan-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.plan-badge {
+  background: linear-gradient(135deg, var(--primary-500), var(--accent-500));
+  color: white;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--border-radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary-500);
+}
+
+.checkbox-group label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.form-row {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+.form-row input {
+  flex: 1;
+}
+
+.form-row input:disabled {
+  background: var(--bg-tertiary);
+  color: var(--text-tertiary);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Mobile Responsive for Pricing Plans */
+@media (max-width: 768px) {
+  .pricing-section {
+    padding: var(--space-md);
+    margin: var(--space-sm) 0;
+  }
+  
+  .pricing-section h4 {
+    font-size: 1.1rem;
+    margin-bottom: var(--space-md);
+  }
+  
+  .pricing-plan {
+    padding: var(--space-sm);
+    margin-bottom: var(--space-sm);
+  }
+  
+  .plan-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
+  }
+  
+  .plan-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+  
+  .form-row input {
+    width: 100%;
+  }
+  
+  .checkbox-group {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .pricing-section {
+    padding: var(--space-sm);
+  }
+  
+  .pricing-section h4 {
+    font-size: 1rem;
+  }
+  
+  .plan-header h5 {
+    font-size: 0.9rem;
+  }
+  
+  .plan-badge {
+    font-size: 0.7rem;
+    padding: 4px 8px;
+  }
+  
+  .checkbox-group label {
+    font-size: 0.8rem;
+  }
+}
