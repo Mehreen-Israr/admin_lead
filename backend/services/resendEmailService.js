@@ -11,7 +11,7 @@ class ResendEmailService {
   loadConfig() {
     return {
       apiKey: process.env.RESEND_API_KEY || process.env.EMAIL_API_KEY,
-      fromEmail: process.env.EMAIL_FROM || process.env.EMAIL_USER || 'noreply@resend.dev',
+      fromEmail: 'noreply@resend.dev', // Always use Resend's verified domain
       fromName: process.env.EMAIL_FROM_NAME || 'Lead Magnet Admin'
     };
   }
