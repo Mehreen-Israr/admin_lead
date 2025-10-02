@@ -12,7 +12,7 @@ class ResendEmailService {
     return {
       apiKey: process.env.RESEND_API_KEY || process.env.EMAIL_API_KEY,
       fromEmail: 'noreply@resend.dev', // Always use Resend's verified domain
-      fromName: process.env.EMAIL_FROM_NAME || 'Lead Magnet Admin'
+      fromName: 'Lead Magnet Admin' // Fixed name
     };
   }
 
@@ -25,6 +25,11 @@ class ResendEmailService {
       }
 
       console.log('Resend email service: Initializing...');
+      console.log('Resend config:', {
+        hasApiKey: !!this.config.apiKey,
+        fromEmail: this.config.fromEmail,
+        fromName: this.config.fromName
+      });
       this.isConfigured = true;
       console.log('Resend email service: Ready');
     } catch (error) {
@@ -38,7 +43,9 @@ class ResendEmailService {
       throw new Error('Resend email service not configured. Please set RESEND_API_KEY environment variable.');
     }
 
-    const { to, subject, text, html, from = this.config.fromEmail } = options;
+    const { to, subject, text, html } = options;
+    // Force use of Resend's verified domain
+    const from = 'noreply@resend.dev';
 
     try {
       console.log('Sending email via Resend API...');
@@ -92,7 +99,8 @@ class ResendEmailService {
   }
 
   async sendReplyEmail(contactEmail, contactName, subject, message, adminEmail = null) {
-    const fromEmail = adminEmail || this.config.fromEmail;
+    // Force use of Resend's verified domain
+    const fromEmail = 'noreply@resend.dev';
     
     const textTemplate = `
 Reply from Lead Magnet Team
