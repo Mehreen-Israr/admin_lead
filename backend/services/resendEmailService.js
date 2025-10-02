@@ -11,7 +11,7 @@ class ResendEmailService {
   loadConfig() {
     return {
       apiKey: process.env.RESEND_API_KEY || process.env.EMAIL_API_KEY,
-      fromEmail: process.env.EMAIL_USER || 'leadmagnet.notifications@gmail.com',
+      fromEmail: process.env.EMAIL_FROM || process.env.EMAIL_USER || 'noreply@resend.dev',
       fromName: process.env.EMAIL_FROM_NAME || 'Lead Magnet Admin'
     };
   }
@@ -43,13 +43,24 @@ class ResendEmailService {
     try {
       console.log('Sending email via Resend API...');
       
+      // Ensure 'to' is an array
+      const recipients = Array.isArray(to) ? to : [to];
+      
       const emailData = {
         from: `${this.config.fromName} <${from}>`,
-        to: [to],
+        to: recipients,
         subject: subject,
         text: text,
         html: html
       };
+
+      console.log('Resend API request data:', {
+        from: emailData.from,
+        to: emailData.to,
+        subject: emailData.subject,
+        hasText: !!emailData.text,
+        hasHtml: !!emailData.html
+      });
 
       const response = await axios.post('https://api.resend.com/emails', emailData, {
         headers: {
@@ -59,7 +70,7 @@ class ResendEmailService {
         timeout: 30000
       });
 
-      console.log('Email sent successfully via Resend API');
+      console.log('Email sent successfully via Resend API:', response.data);
       return {
         success: true,
         messageId: response.data.id,
@@ -68,8 +79,15 @@ class ResendEmailService {
       };
 
     } catch (error) {
-      console.error('Resend API failed:', error.response?.data || error.message);
-      throw new Error('Resend API failed: ' + (error.response?.data?.message || error.message));
+      console.error('Resend API failed:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message
+      });
+      
+      const errorMessage = error.response?.data?.message || error.message;
+      throw new Error(`Resend API failed: ${errorMessage}`);
     }
   }
 
@@ -147,11 +165,43 @@ If you have any questions, please don't hesitate to contact us.
     });
   }
 
+  async testConnection() {
+    if (!this.isConfigured) {
+      return false;
+    }
+
+    try {
+      // Test with a simple API call to check if the API key is valid
+      const response = await axios.get('https://api.resend.com/domains', {
+        headers: {
+          'Authorization': `Bearer ${this.config.apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        timeout: 10000
+      });
+      
+      console.log('Resend API connection test successful');
+      return true;
+    } catch (error) {
+      console.error('Resend API connection test failed:', error.response?.data || error.message);
+      return false;
+    }
+  }
+
+  async reinitialize() {
+    console.log('Reinitializing Resend email service...');
+    this.config = this.loadConfig();
+    this.initialize();
+    return this.isConfigured;
+  }
+
   getStatus() {
     return {
       configured: this.isConfigured,
       service: 'resend',
-      fromEmail: this.config.fromEmail
+      fromEmail: this.config.fromEmail,
+      fromName: this.config.fromName,
+      hasApiKey: !!this.config.apiKey
     };
   }
 }

@@ -914,6 +914,46 @@ router.get('/email/test', adminAuth, async (req, res) => {
   }
 });
 
+// Test Resend email service specifically
+router.get('/email/test-resend', adminAuth, async (req, res) => {
+  try {
+    const { resendEmailService } = require('../services/resendEmailService');
+    
+    const status = resendEmailService.getStatus();
+    
+    if (!status.configured) {
+      return res.status(503).json({
+        success: false,
+        message: 'Resend email service not configured',
+        status: status
+      });
+    }
+
+    // Test Resend API connection
+    const connectionTest = await resendEmailService.testConnection();
+    
+    if (!connectionTest) {
+      return res.status(503).json({
+        success: false,
+        message: 'Resend API connection test failed',
+        status: status
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Resend email service is working correctly',
+      status: status
+    });
+  } catch (error) {
+    console.error('Error testing Resend email service:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error testing Resend email service: ' + error.message
+    });
+  }
+});
+
 // Reinitialize email service
 router.post('/email/reinitialize', adminAuth, async (req, res) => {
   try {
@@ -984,6 +1024,48 @@ router.post('/email/test', adminAuth, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error sending test email: ' + error.message
+    });
+  }
+});
+
+// Send test email via Resend
+router.post('/email/test-resend', adminAuth, async (req, res) => {
+  try {
+    const { to } = req.body;
+    const { resendEmailService } = require('../services/resendEmailService');
+    
+    const testEmail = await resendEmailService.sendEmail({
+      to: to || process.env.EMAIL_USER || 'test@example.com',
+      subject: 'Lead Magnet - Resend API Test',
+      text: 'This is a test email from Lead Magnet admin panel using Resend API. If you receive this, the Resend service is working correctly.',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f8f9fa; border-radius: 8px;">
+          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 8px 8px 0 0; text-align: center; margin: -20px -20px 20px -20px;">
+            <h2 style="color: #ffffff; margin: 0;">Lead Magnet - Resend API Test</h2>
+          </div>
+          <p>This is a test email from Lead Magnet admin panel using <strong>Resend API</strong>.</p>
+          <p>If you receive this, the Resend service is working correctly.</p>
+          <div style="background-color: #e9ecef; padding: 15px; border-radius: 4px; margin: 20px 0;">
+            <p style="margin: 0; color: #495057; font-size: 14px;">
+              <strong>Service:</strong> Resend API<br>
+              <strong>Sent at:</strong> ${new Date().toLocaleString()}<br>
+              <strong>Status:</strong> ✅ Working
+            </p>
+          </div>
+        </div>
+      `
+    });
+
+    res.json({
+      success: true,
+      message: 'Resend test email sent successfully',
+      data: testEmail
+    });
+  } catch (error) {
+    console.error('Error sending Resend test email:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error sending Resend test email: ' + error.message
     });
   }
 });

@@ -186,19 +186,19 @@ class EmailService {
   }
 
   async sendReplyEmail(contactEmail, contactName, subject, message, adminEmail = null) {
-    // Try working email service first (always works)
+    // Try Resend API first (preferred method)
     try {
-      console.log('Trying working email service...');
-      return await workingEmailService.sendReplyEmail(contactEmail, contactName, subject, message, adminEmail);
+      console.log('Trying Resend API service...');
+      return await resendEmailService.sendReplyEmail(contactEmail, contactName, subject, message, adminEmail);
     } catch (error) {
-      console.error('Working email service failed, trying Resend API:', error.message);
+      console.error('Resend API failed, trying working email service:', error.message);
       
-      // Try Resend API (if configured)
+      // Try working email service as fallback
       try {
-        console.log('Trying Resend API service...');
-        return await resendEmailService.sendReplyEmail(contactEmail, contactName, subject, message, adminEmail);
-      } catch (resendError) {
-        console.error('Resend API failed, trying main email service:', resendError.message);
+        console.log('Trying working email service...');
+        return await workingEmailService.sendReplyEmail(contactEmail, contactName, subject, message, adminEmail);
+      } catch (workingError) {
+        console.error('Working email service failed, trying main email service:', workingError.message);
         
         // Fallback to main email service
         try {
