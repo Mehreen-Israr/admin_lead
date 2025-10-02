@@ -152,7 +152,7 @@ If you have any questions, please don't hesitate to contact us.
     `;
 
     return await this.sendEmail({
-      to: contactEmail,
+      to: contactEmail, // Send directly to the contact
       subject: subject,
       text: textTemplate,
       html: htmlTemplate,
