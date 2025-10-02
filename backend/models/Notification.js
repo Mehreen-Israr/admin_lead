@@ -13,7 +13,7 @@ const notificationSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['user', 'contact', 'system', 'alert', 'info', 'user_registered', 'user_created', 'contact_submitted', 'data_exported', 'settings_updated', 'system_maintenance'],
+    enum: ['user', 'contact', 'system', 'alert', 'info', 'user_registered', 'user_created', 'contact_submitted', 'data_exported', 'settings_updated', 'system_maintenance', 'email_sent', 'booking_updated'],
     required: true
   },
   priority: {

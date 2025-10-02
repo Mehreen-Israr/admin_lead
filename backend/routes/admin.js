@@ -852,7 +852,9 @@ function getActivityIcon(type) {
     'contact_submitted': 'fas fa-envelope',
     'data_exported': 'fas fa-file-export',
     'settings_updated': 'fas fa-cog',
-    'system_maintenance': 'fas fa-exclamation-triangle'
+    'system_maintenance': 'fas fa-exclamation-triangle',
+    'email_sent': 'fas fa-paper-plane',
+    'booking_updated': 'fas fa-calendar-check'
   };
   return iconMap[type] || 'fas fa-info-circle';
 }
@@ -864,7 +866,9 @@ function getActivityColor(type) {
     'contact_submitted': 'primary',
     'data_exported': 'info',
     'settings_updated': 'warning',
-    'system_maintenance': 'warning'
+    'system_maintenance': 'warning',
+    'email_sent': 'success',
+    'booking_updated': 'info'
   };
   return colorMap[type] || 'primary';
 }
