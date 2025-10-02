@@ -1,10 +1,9 @@
-// Gmail SMTP email service using Nodemailer
 const nodemailer = require('nodemailer');
 
-class GmailEmailService {
+class RenderEmailService {
   constructor() {
-    this.isConfigured = false;
     this.transporter = null;
+    this.isConfigured = false;
     this.config = this.loadConfig();
     this.initialize();
   }
@@ -12,107 +11,112 @@ class GmailEmailService {
   loadConfig() {
     return {
       host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-      port: process.env.EMAIL_PORT || 587,
-      user: process.env.EMAIL_USER || 'leadmagnet.notifications@gmail.com',
-      pass: process.env.EMAIL_PASS || 'drjipelanfuflzbt'
+      port: parseInt(process.env.EMAIL_PORT || '587', 10),
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+      fromName: process.env.EMAIL_FROM_NAME || 'Lead Magnet Admin'
     };
   }
 
   initialize() {
     try {
-      console.log('Gmail email service: Initializing...');
-      
+      console.log('Render email service: Initializing...');
+
       if (!this.config.user || !this.config.pass) {
-        console.warn('Gmail email service: No credentials provided');
+        console.warn('Render email service: No credentials provided');
         this.isConfigured = false;
         return;
       }
 
+      // Create transporter with Render-optimized settings
       this.transporter = nodemailer.createTransport({
         host: this.config.host,
         port: this.config.port,
-        secure: false, // false = TLS on port 587
+        secure: false, // Use TLS
         auth: {
           user: this.config.user,
           pass: this.config.pass,
         },
         tls: {
-          rejectUnauthorized: false, // avoids TLS issues on Render
+          rejectUnauthorized: false,
+          ciphers: 'SSLv3'
         },
-        // Enhanced connection settings for Render
-        connectionTimeout: 60000, // 60 seconds
-        greetingTimeout: 30000,   // 30 seconds
-        socketTimeout: 60000,     // 60 seconds
-        // Additional settings for Render
-        pool: true,
+        // Render-specific optimizations
+        connectionTimeout: 30000,
+        greetingTimeout: 15000,
+        socketTimeout: 30000,
+        // Disable pooling for Render
+        pool: false,
+        // Single connection
         maxConnections: 1,
-        maxMessages: 3,
-        rateDelta: 20000,
-        rateLimit: 5,
-        // Retry settings
-        retryDelay: 5000,
-        retryAttempts: 3
+        maxMessages: 1,
+        // Quick retry
+        retryDelay: 1000,
+        retryAttempts: 2
       });
 
-      console.log('Gmail email service: Ready');
+      console.log('Render email service: Ready');
       this.isConfigured = true;
     } catch (error) {
-      console.error('Gmail email service initialization failed:', error);
+      console.error('Render email service initialization failed:', error);
       this.isConfigured = false;
     }
   }
 
   async sendEmail(options) {
     if (!this.isConfigured || !this.transporter) {
-      throw new Error('Gmail email service not configured. Please check your email credentials.');
+      throw new Error('Render email service not configured. Please check your email credentials.');
     }
 
     const { to, subject, text, html, from = this.config.user } = options;
 
     try {
-      console.log('Sending email via Gmail SMTP...');
+      console.log('Sending email via Render-optimized SMTP...');
       
-      // Add retry logic for Render connection issues
-      let attempts = 0;
-      const maxAttempts = 3;
-      
-      while (attempts < maxAttempts) {
-        try {
-          const mailOptions = {
-            from: `"Lead Magnet Admin" <${from}>`,
-            to: Array.isArray(to) ? to : [to],
-            subject: subject,
-            text: text,
-            html: html
-          };
-
-          const info = await this.transporter.sendMail(mailOptions);
-          console.log('Email sent successfully via Gmail SMTP:', info.messageId);
-          
-          return {
-            success: true,
-            messageId: info.messageId,
-            response: 'Email sent via Gmail SMTP',
-            data: info
-          };
-        } catch (error) {
-          attempts++;
-          console.log(`Gmail SMTP attempt ${attempts} failed:`, error.message);
-          
-          if (attempts >= maxAttempts) {
-            throw error;
-          }
-          
-          // Wait before retry (exponential backoff)
-          const delay = 2000 * attempts; // 2s, 4s, 6s
-          console.log(`Retrying in ${delay}ms...`);
-          await new Promise(resolve => setTimeout(resolve, delay));
+      const mailOptions = {
+        from: `"Lead Magnet Admin" <${from}>`,
+        to: Array.isArray(to) ? to : [to],
+        subject: subject,
+        text: text,
+        html: html,
+        // Add headers for better deliverability
+        headers: {
+          'X-Mailer': 'Lead Magnet Admin Panel',
+          'X-Priority': '3'
         }
-      }
+      };
+
+      // Use a timeout wrapper for Render
+      const sendWithTimeout = (mailOptions, timeout = 25000) => {
+        return new Promise((resolve, reject) => {
+          const timer = setTimeout(() => {
+            reject(new Error('Email send timeout'));
+          }, timeout);
+
+          this.transporter.sendMail(mailOptions, (error, info) => {
+            clearTimeout(timer);
+            if (error) {
+              reject(error);
+            } else {
+              resolve(info);
+            }
+          });
+        });
+      };
+
+      const info = await sendWithTimeout(mailOptions);
+      console.log('Email sent successfully via Render SMTP:', info.messageId);
+      
+      return {
+        success: true,
+        messageId: info.messageId,
+        response: 'Email sent via Render SMTP',
+        data: info
+      };
 
     } catch (error) {
-      console.error('Gmail SMTP failed after retries:', error);
-      throw new Error('Gmail SMTP failed: ' + error.message);
+      console.error('Render SMTP failed:', error);
+      throw new Error('Render SMTP failed: ' + error.message);
     }
   }
 
@@ -197,27 +201,33 @@ If you have any questions, please don't hesitate to contact us.
 
     try {
       await this.transporter.verify();
-      console.log('Gmail SMTP connection test successful');
+      console.log('Render SMTP connection test successful');
       return true;
     } catch (error) {
-      console.error('Gmail SMTP connection test failed:', error.message);
+      console.error('Render SMTP connection test failed:', error.message);
       return false;
     }
+  }
+
+  async reinitialize() {
+    console.log('Reinitializing Render email service...');
+    this.config = this.loadConfig();
+    this.initialize();
+    return this.isConfigured;
   }
 
   getStatus() {
     return {
       configured: this.isConfigured,
-      service: 'gmail-smtp',
+      service: 'render-smtp',
       fromEmail: this.config.user,
-      fromName: 'Lead Magnet Admin'
+      fromName: this.config.fromName
     };
   }
 }
 
-// Create singleton instance
-const gmailEmailService = new GmailEmailService();
+const renderEmailService = new RenderEmailService();
 
 module.exports = {
-  gmailEmailService
+  renderEmailService
 };
