@@ -33,7 +33,7 @@ async function testGmailService() {
   console.log('\n📧 Testing email sending...');
   try {
     const testEmail = await gmailEmailService.sendEmail({
-      to: 'leadmagnet.notifications@gmail.com', // Send to your own email for testing
+      to: 'mehreenisrar.26@gmail.com', // Test sending to a contact email
       subject: 'Gmail SMTP Test - Lead Magnet',
       text: 'This is a test email from Lead Magnet using Gmail SMTP.',
       html: `
