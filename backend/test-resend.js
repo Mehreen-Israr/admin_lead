@@ -37,7 +37,7 @@ async function testResendService() {
   console.log('\n📧 Testing email sending...');
   try {
     const testEmail = await resendEmailService.sendEmail({
-      to: 'leadmagnet.notifications@gmail.com', // This will work with @resend.dev sender
+      to: 'leadmagnet.notifications@gmail.com', // Must use verified email for @resend.dev
       subject: 'Resend API Test - Lead Magnet',
       text: 'This is a test email from Lead Magnet using Resend API.',
       html: `

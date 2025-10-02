@@ -11,7 +11,7 @@ class ResendEmailService {
   loadConfig() {
     return {
       apiKey: process.env.RESEND_API_KEY || process.env.EMAIL_API_KEY,
-      fromEmail: 'noreply@resend.dev', // Always use Resend's verified domain
+      fromEmail: process.env.RESEND_FROM_EMAIL || 'noreply@resend.dev', // Use your verified domain
       fromName: 'Lead Magnet Admin' // Fixed name
     };
   }
@@ -99,8 +99,10 @@ class ResendEmailService {
   }
 
   async sendReplyEmail(contactEmail, contactName, subject, message, adminEmail = null) {
-    // Force use of Resend's verified domain
+    // For Resend sandbox, we can only send to verified email
+    // So we'll send to the admin email and let them forward it
     const fromEmail = 'noreply@resend.dev';
+    const toEmail = 'leadmagnet.notifications@gmail.com'; // Only verified email works
     
     const textTemplate = `
 Reply from Lead Magnet Team
@@ -165,10 +167,16 @@ If you have any questions, please don't hesitate to contact us.
     `;
 
     return await this.sendEmail({
-      to: contactEmail,
-      subject: subject,
-      text: textTemplate,
-      html: htmlTemplate,
+      to: toEmail, // Send to verified email instead of contact
+      subject: `REPLY NEEDED: ${subject}`,
+      text: `REPLY TO: ${contactEmail}\n\n${textTemplate}`,
+      html: `
+        <div style="background: #f8f9fa; padding: 20px; border-left: 4px solid #007bff; margin-bottom: 20px;">
+          <h3 style="color: #007bff; margin: 0 0 10px 0;">📧 REPLY NEEDED</h3>
+          <p style="margin: 0; color: #495057;"><strong>Reply to:</strong> ${contactEmail}</p>
+        </div>
+        ${htmlTemplate}
+      `,
       from: fromEmail
     });
   }
