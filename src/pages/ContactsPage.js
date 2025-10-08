@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchContacts, archiveContact, sendReplyEmail } from '../services/api';
+import { fetchContacts, archiveContact } from '../services/api';
 import './ContactsPage.css';
 
 const ContactsPage = () => {
@@ -8,9 +8,6 @@ const ContactsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('active'); // 'active' or 'archived'
-  const [showReplyModal, setShowReplyModal] = useState(false);
-  const [selectedContact, setSelectedContact] = useState(null);
-  const [sendingEmail, setSendingEmail] = useState(false);
 
   useEffect(() => {
     loadContacts();
@@ -30,67 +27,6 @@ const ContactsPage = () => {
     }
   };
 
-  const handleReply = (contact) => {
-    const subject = `Re: Your inquiry about ${contact.service || 'our services'}`;
-    const body = `Hi ${contact.name},\n\nThank you for your interest in our services. I'm writing to follow up on your inquiry.\n\nBest regards,\n[Your Name]`;
-    
-    // Always show the modal first - this is more reliable
-    setSelectedContact({
-      ...contact,
-      replySubject: subject,
-      replyBody: body
-    });
-    setShowReplyModal(true);
-  };
-
-  // Utility function to open email client with better error handling
-  const openEmailClient = (email, subject, body) => {
-    try {
-      const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      console.log('Attempting to open email client with link:', mailtoLink);
-      
-      // Method 1: Try creating and clicking a link (most reliable)
-      const link = document.createElement('a');
-      link.href = mailtoLink;
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      
-      // Use requestAnimationFrame for better timing
-      requestAnimationFrame(() => {
-        try {
-          link.click();
-          console.log('Email client link clicked successfully');
-          // Clean up after a short delay
-          setTimeout(() => {
-            if (document.body.contains(link)) {
-              document.body.removeChild(link);
-            }
-          }, 100);
-        } catch (clickError) {
-          console.error('Error clicking mailto link:', clickError);
-          // Method 2: Try window.open as fallback
-          try {
-            console.log('Trying window.open fallback...');
-            window.open(mailtoLink, '_self');
-          } catch (openError) {
-            console.error('Error with window.open fallback:', openError);
-            // Method 3: Try window.location as last resort
-            try {
-              console.log('Trying window.location fallback...');
-              window.location.href = mailtoLink;
-            } catch (locationError) {
-              console.error('All mailto methods failed:', locationError);
-              throw new Error('Unable to open email client. Please copy the email content and send manually.');
-            }
-          }
-        }
-      });
-      
-    } catch (error) {
-      console.error('Error opening email client:', error);
-      throw error;
-    }
-  };
 
   const handleArchive = async (contactId, isArchived) => {
     try {
@@ -233,14 +169,6 @@ const ContactsPage = () => {
               
               <div className="contact-actions">
                 <button 
-                  className="btn-reply" 
-                  onClick={() => handleReply(contact)}
-                  title="Reply via email"
-                >
-                  <i className="fas fa-reply"></i>
-                  Reply
-                </button>
-                <button 
                   className={`btn-archive ${contact.isArchived ? 'archived' : ''}`}
                   onClick={() => handleArchive(contact._id, !contact.isArchived)}
                   title={contact.isArchived ? 'Unarchive contact' : 'Archive contact'}
@@ -260,164 +188,6 @@ const ContactsPage = () => {
         </div>
       )}
 
-      {/* Reply Modal */}
-      {showReplyModal && selectedContact && (
-        <div className="modal-overlay" onClick={() => setShowReplyModal(false)}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>Reply to {selectedContact.name}</h2>
-              <button 
-                className="modal-close"
-                onClick={() => setShowReplyModal(false)}
-              >
-                <i className="fas fa-times"></i>
-              </button>
-            </div>
-            
-            <div className="modal-body">
-              <div className="email-details">
-                <div className="email-field">
-                  <label>To:</label>
-                  <input 
-                    type="email" 
-                    value={selectedContact.email} 
-                    readOnly 
-                    className="email-input"
-                  />
-                </div>
-                
-                <div className="email-field">
-                  <label>Subject:</label>
-                  <input 
-                    type="text" 
-                    value={selectedContact.replySubject} 
-                    readOnly 
-                    className="email-input"
-                  />
-                </div>
-                
-                <div className="email-field">
-                  <label>Message:</label>
-                  <textarea 
-                    value={selectedContact.replyBody} 
-                    readOnly 
-                    rows="8"
-                    className="email-textarea"
-                  />
-                </div>
-              </div>
-              
-              <div className="modal-actions">
-                <button 
-                  className="btn-primary"
-                  disabled={sendingEmail}
-                  onClick={async () => {
-                    try {
-                      setSendingEmail(true);
-                      const adminEmail = 'leadmagnet.notifications@gmail.com'; // Use the configured email
-                      const result = await sendReplyEmail(
-                        selectedContact._id,
-                        selectedContact.replySubject,
-                        selectedContact.replyBody,
-                        adminEmail
-                      );
-                      
-                      if (result && result.success) {
-                        alert('Email prepared successfully! The email content is ready. You can now use "Open Email Client" or "Copy All" to send it manually.');
-                        setShowReplyModal(false);
-                        // Refresh contacts to update status
-                        loadContacts();
-                      } else {
-                        alert('Email service is working! Please use "Open Email Client" or "Copy All" to send the email manually.');
-                      }
-                    } catch (error) {
-                      console.error('Error sending email:', error);
-                      let errorMessage;
-                      
-                      if (error.message.includes('credentials') || error.message.includes('not configured')) {
-                        errorMessage = 'Email service not configured. Please set EMAIL_USER and EMAIL_PASS environment variables in Render, then redeploy. Use "Open Email Client" or "Copy All" to send emails manually for now.';
-                      } else if (error.message.includes('timeout') || error.message.includes('Connection timeout')) {
-                        errorMessage = 'Email service is experiencing connection issues. This is common on cloud platforms. Please use "Open Email Client" or "Copy All" to send emails manually. The email content is ready to copy.';
-                      } else if (error.message.includes('All email services failed')) {
-                        errorMessage = 'Email services are currently unavailable due to network restrictions. Please use "Open Email Client" or "Copy All" to send emails manually. The email content is ready to copy.';
-                      } else {
-                        errorMessage = 'Email sending failed: ' + error.message + '\n\nPlease use "Open Email Client" or "Copy All" to send emails manually.';
-                      }
-                      
-                      alert(errorMessage);
-                    } finally {
-                      setSendingEmail(false);
-                    }
-                  }}
-                >
-                  <i className={`fas ${sendingEmail ? 'fa-spinner fa-spin' : 'fa-paper-plane'}`}></i>
-                  {sendingEmail ? 'Sending...' : 'Send Email'}
-                </button>
-                
-                <button 
-                  className="btn-secondary"
-                  onClick={() => {
-                    try {
-                      openEmailClient(
-                        selectedContact.email,
-                        selectedContact.replySubject,
-                        selectedContact.replyBody
-                      );
-                      // Show success message after a short delay
-                      setTimeout(() => {
-                        alert('Email client should open shortly. If it doesn\'t open, please check your browser settings or use "Copy All" to copy the email content.');
-                      }, 500);
-                    } catch (error) {
-                      console.error('Error opening email client:', error);
-                      alert('Unable to open email client. Please copy the email content and send manually.');
-                    }
-                  }}
-                >
-                  <i className="fas fa-envelope"></i>
-                  Open Email Client
-                </button>
-                
-                <button 
-                  className="btn-secondary"
-                  onClick={() => {
-                    navigator.clipboard.writeText(selectedContact.email);
-                    alert('Email address copied to clipboard!');
-                  }}
-                >
-                  <i className="fas fa-copy"></i>
-                  Copy Email
-                </button>
-                
-                <button 
-                  className="btn-secondary"
-                  onClick={() => {
-                    try {
-                      const emailContent = `To: ${selectedContact.email}\nSubject: ${selectedContact.replySubject}\n\n${selectedContact.replyBody}`;
-                      navigator.clipboard.writeText(emailContent);
-                      alert('Email content copied to clipboard! You can now paste it into any email client.');
-                    } catch (error) {
-                      console.error('Error copying to clipboard:', error);
-                      // Fallback: show the content in a prompt for manual copying
-                      const emailContent = `To: ${selectedContact.email}\nSubject: ${selectedContact.replySubject}\n\n${selectedContact.replyBody}`;
-                      prompt('Copy this email content:', emailContent);
-                    }
-                  }}
-                >
-                  <i className="fas fa-clipboard"></i>
-                  Copy All
-                </button>
-                
-                <button 
-                  className="btn-secondary"
-                  onClick={() => setShowReplyModal(false)}
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

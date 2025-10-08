@@ -464,7 +464,7 @@
   border-top: 1px solid var(--border-secondary);
 }
 
-.btn-reply, .btn-archive {
+.btn-archive {
   display: flex;
   align-items: center;
   gap: var(--space-xs);
@@ -477,17 +477,6 @@
   cursor: pointer;
   transition: all var(--transition-normal);
   backdrop-filter: blur(10px);
-}
-
-.btn-reply {
-  border-color: var(--primary-400);
-  color: var(--primary-400);
-}
-
-.btn-reply:hover {
-  background: var(--primary-400);
-  color: var(--bg-primary);
-  transform: translateY(-1px);
 }
 
 .btn-archive {
@@ -942,7 +931,7 @@
     border-top: 1px solid var(--border-secondary);
   }
   
-  .btn-reply, .btn-archive {
+  .btn-archive {
     width: 100%;
     padding: var(--space-md) var(--space-lg);
     font-size: 0.95rem;
@@ -1002,7 +991,7 @@
     padding: var(--space-sm);
   }
   
-  .btn-reply, .btn-archive {
+  .btn-archive {
     padding: var(--space-sm) var(--space-md);
     font-size: 0.9rem;
     min-height: 44px;
