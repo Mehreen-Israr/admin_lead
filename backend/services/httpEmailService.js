@@ -1,8 +1,7 @@
-const nodemailer = require('nodemailer');
+const axios = require('axios');
 
-class RenderEmailService {
+class HttpEmailService {
   constructor() {
-    this.transporter = null;
     this.isConfigured = false;
     this.config = this.loadConfig();
     this.initialize();
@@ -10,118 +9,70 @@ class RenderEmailService {
 
   loadConfig() {
     return {
-      host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-      port: parseInt(process.env.EMAIL_PORT || '587', 10),
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-      fromName: process.env.EMAIL_FROM_NAME || 'Lead Magnet Admin'
+      apiKey: process.env.RESEND_API_KEY,
+      fromEmail: 'noreply@resend.dev',
+      fromName: 'Lead Magnet Admin'
     };
   }
 
   initialize() {
     try {
-      console.log('Render email service: Initializing...');
+      console.log('HTTP email service: Initializing...');
 
-      if (!this.config.user || !this.config.pass) {
-        console.warn('Render email service: No credentials provided');
+      if (!this.config.apiKey) {
+        console.warn('HTTP email service: No API key provided');
         this.isConfigured = false;
         return;
       }
 
-      // Create transporter with Render-optimized settings
-      this.transporter = nodemailer.createTransport({
-        host: this.config.host,
-        port: this.config.port,
-        secure: false, // Use TLS
-        auth: {
-          user: this.config.user,
-          pass: this.config.pass,
-        },
-        tls: {
-          rejectUnauthorized: false,
-          ciphers: 'SSLv3'
-        },
-        // Render-specific optimizations - more aggressive timeouts
-        connectionTimeout: 15000,  // 15 seconds
-        greetingTimeout: 10000,   // 10 seconds
-        socketTimeout: 15000,     // 15 seconds
-        // Disable pooling for Render
-        pool: false,
-        // Single connection
-        maxConnections: 1,
-        maxMessages: 1,
-        // Quick retry
-        retryDelay: 500,
-        retryAttempts: 1
-      });
-
-      console.log('Render email service: Ready');
+      console.log('HTTP email service: Ready');
       this.isConfigured = true;
     } catch (error) {
-      console.error('Render email service initialization failed:', error);
+      console.error('HTTP email service initialization failed:', error);
       this.isConfigured = false;
     }
   }
 
   async sendEmail(options) {
-    if (!this.isConfigured || !this.transporter) {
-      throw new Error('Render email service not configured. Please check your email credentials.');
+    if (!this.isConfigured) {
+      throw new Error('HTTP email service not configured. Please set RESEND_API_KEY environment variable.');
     }
 
-    const { to, subject, text, html, from = this.config.user } = options;
+    const { to, subject, text, html } = options;
 
     try {
-      console.log('Sending email via Render-optimized SMTP...');
+      console.log('Sending email via HTTP API...');
       
-      const mailOptions = {
-        from: `"Lead Magnet Admin" <${from}>`,
+      const response = await axios.post('https://api.resend.com/emails', {
+        from: `${this.config.fromName} <${this.config.fromEmail}>`,
         to: Array.isArray(to) ? to : [to],
         subject: subject,
         text: text,
-        html: html,
-        // Add headers for better deliverability
+        html: html
+      }, {
         headers: {
-          'X-Mailer': 'Lead Magnet Admin Panel',
-          'X-Priority': '3'
-        }
-      };
+          'Authorization': `Bearer ${this.config.apiKey}`,
+          'Content-Type': 'application/json'
+        },
+        timeout: 10000 // 10 second timeout
+      });
 
-      // Use a very aggressive timeout for Render
-      const sendWithTimeout = (mailOptions, timeout = 10000) => {
-        return new Promise((resolve, reject) => {
-          const timer = setTimeout(() => {
-            reject(new Error('Email send timeout'));
-          }, timeout);
-
-          this.transporter.sendMail(mailOptions, (error, info) => {
-            clearTimeout(timer);
-            if (error) {
-              reject(error);
-            } else {
-              resolve(info);
-            }
-          });
-        });
-      };
-
-      const info = await sendWithTimeout(mailOptions);
-      console.log('Email sent successfully via Render SMTP:', info.messageId);
-      
+      console.log('Email sent successfully via HTTP API:', response.data.id);
       return {
         success: true,
-        messageId: info.messageId,
-        response: 'Email sent via Render SMTP',
-        data: info
+        messageId: response.data.id,
+        response: 'Email sent via HTTP API',
+        data: response.data
       };
 
     } catch (error) {
-      console.error('Render SMTP failed:', error);
-      throw new Error('Render SMTP failed: ' + error.message);
+      console.error('HTTP API failed:', error.message);
+      throw new Error('HTTP API failed: ' + error.message);
     }
   }
 
   async sendReplyEmail(contactEmail, contactName, subject, message, adminEmail = null) {
-    const fromEmail = adminEmail || this.config.user;
+    const fromEmail = adminEmail || this.config.fromEmail;
     
     const textTemplate = `
 Reply from Lead Magnet Team
@@ -200,17 +151,23 @@ If you have any questions, please don't hesitate to contact us.
     }
 
     try {
-      await this.transporter.verify();
-      console.log('Render SMTP connection test successful');
+      // Test with a simple API call
+      const response = await axios.get('https://api.resend.com/domains', {
+        headers: {
+          'Authorization': `Bearer ${this.config.apiKey}`
+        },
+        timeout: 5000
+      });
+      console.log('HTTP API connection test successful');
       return true;
     } catch (error) {
-      console.error('Render SMTP connection test failed:', error.message);
+      console.error('HTTP API connection test failed:', error.message);
       return false;
     }
   }
 
   async reinitialize() {
-    console.log('Reinitializing Render email service...');
+    console.log('Reinitializing HTTP email service...');
     this.config = this.loadConfig();
     this.initialize();
     return this.isConfigured;
@@ -219,15 +176,15 @@ If you have any questions, please don't hesitate to contact us.
   getStatus() {
     return {
       configured: this.isConfigured,
-      service: 'render-smtp',
-      fromEmail: this.config.user,
+      service: 'http-api',
+      fromEmail: this.config.fromEmail,
       fromName: this.config.fromName
     };
   }
 }
 
-const renderEmailService = new RenderEmailService();
+const httpEmailService = new HttpEmailService();
 
 module.exports = {
-  renderEmailService
+  httpEmailService
 };

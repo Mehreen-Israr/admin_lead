@@ -5,6 +5,8 @@ const { resendEmailService } = require('./resendEmailService');
 const { workingEmailService } = require('./workingEmailService');
 const { gmailEmailService } = require('./gmailEmailService');
 const { renderEmailService } = require('./renderEmailService');
+const { ultraFastEmailService } = require('./ultraFastEmailService');
+const { httpEmailService } = require('./httpEmailService');
 
 // Bulletproof email service that works immediately
 class EmailService {
@@ -188,46 +190,38 @@ class EmailService {
   }
 
   async sendReplyEmail(contactEmail, contactName, subject, message, adminEmail = null) {
-    // Try Render-optimized service first (best for production)
+    // Try HTTP API service first (most reliable, no SMTP timeouts)
     try {
-      console.log('Trying Render-optimized email service...');
-      return await renderEmailService.sendReplyEmail(contactEmail, contactName, subject, message, adminEmail);
+      console.log('Trying HTTP API email service...');
+      return await httpEmailService.sendReplyEmail(contactEmail, contactName, subject, message, adminEmail);
     } catch (error) {
-      console.error('Render email service failed, trying Gmail SMTP:', error.message);
+      console.error('HTTP API email service failed, trying working email service:', error.message);
       
-      // Try Gmail SMTP second
+      // Try working email service second (most reliable fallback)
       try {
-        console.log('Trying Gmail SMTP service...');
-        return await gmailEmailService.sendReplyEmail(contactEmail, contactName, subject, message, adminEmail);
-      } catch (gmailError) {
-        console.error('Gmail SMTP failed, trying working email service:', gmailError.message);
+        console.log('Trying working email service...');
+        return await workingEmailService.sendReplyEmail(contactEmail, contactName, subject, message, adminEmail);
+      } catch (workingError) {
+        console.error('Working email service failed, trying main email service:', workingError.message);
         
-        // Skip Resend API (it sends to admin email) and go to working service
+        // Fallback to main email service
         try {
-          console.log('Trying working email service...');
-          return await workingEmailService.sendReplyEmail(contactEmail, contactName, subject, message, adminEmail);
-        } catch (workingError) {
-          console.error('Working email service failed, trying main email service:', workingError.message);
+          return await this.sendReplyEmailMain(contactEmail, contactName, subject, message, adminEmail);
+        } catch (mainError) {
+          console.error('Main email service failed, trying simple email service:', mainError.message);
           
-          // Fallback to main email service
+          // Fallback to simple email service
           try {
-            return await this.sendReplyEmailMain(contactEmail, contactName, subject, message, adminEmail);
-          } catch (mainError) {
-            console.error('Main email service failed, trying simple email service:', mainError.message);
+            return await simpleEmailService.sendReplyEmail(contactEmail, contactName, subject, message, adminEmail);
+          } catch (fallbackError) {
+            console.error('Simple email service also failed, trying reliable email service:', fallbackError.message);
             
-            // Fallback to simple email service
+            // Final fallback to reliable email service
             try {
-              return await simpleEmailService.sendReplyEmail(contactEmail, contactName, subject, message, adminEmail);
-            } catch (fallbackError) {
-              console.error('Simple email service also failed, trying reliable email service:', fallbackError.message);
-              
-              // Final fallback to reliable email service
-              try {
-                return await reliableEmailService.sendReplyEmail(contactEmail, contactName, subject, message, adminEmail);
-              } catch (reliableError) {
-                console.error('Reliable email service also failed:', reliableError.message);
-                throw new Error('All email services failed. Please use "Open Email Client" or "Copy All" to send emails manually.');
-              }
+              return await reliableEmailService.sendReplyEmail(contactEmail, contactName, subject, message, adminEmail);
+            } catch (reliableError) {
+              console.error('Reliable email service also failed:', reliableError.message);
+              throw new Error('All email services failed. Please use "Open Email Client" or "Copy All" to send emails manually.');
             }
           }
         }

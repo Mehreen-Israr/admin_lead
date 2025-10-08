@@ -1,6 +1,6 @@
 const nodemailer = require('nodemailer');
 
-class RenderEmailService {
+class UltraFastEmailService {
   constructor() {
     this.transporter = null;
     this.isConfigured = false;
@@ -20,19 +20,19 @@ class RenderEmailService {
 
   initialize() {
     try {
-      console.log('Render email service: Initializing...');
+      console.log('Ultra-fast email service: Initializing...');
 
       if (!this.config.user || !this.config.pass) {
-        console.warn('Render email service: No credentials provided');
+        console.warn('Ultra-fast email service: No credentials provided');
         this.isConfigured = false;
         return;
       }
 
-      // Create transporter with Render-optimized settings
+      // Ultra-aggressive settings for Render
       this.transporter = nodemailer.createTransport({
         host: this.config.host,
         port: this.config.port,
-        secure: false, // Use TLS
+        secure: false,
         auth: {
           user: this.config.user,
           pass: this.config.pass,
@@ -41,37 +41,36 @@ class RenderEmailService {
           rejectUnauthorized: false,
           ciphers: 'SSLv3'
         },
-        // Render-specific optimizations - more aggressive timeouts
-        connectionTimeout: 15000,  // 15 seconds
-        greetingTimeout: 10000,   // 10 seconds
-        socketTimeout: 15000,     // 15 seconds
-        // Disable pooling for Render
+        // Ultra-aggressive timeouts for Render
+        connectionTimeout: 8000,   // 8 seconds
+        greetingTimeout: 5000,     // 5 seconds
+        socketTimeout: 8000,      // 8 seconds
+        // No pooling
         pool: false,
-        // Single connection
         maxConnections: 1,
         maxMessages: 1,
-        // Quick retry
-        retryDelay: 500,
-        retryAttempts: 1
+        // No retries
+        retryDelay: 0,
+        retryAttempts: 0
       });
 
-      console.log('Render email service: Ready');
+      console.log('Ultra-fast email service: Ready');
       this.isConfigured = true;
     } catch (error) {
-      console.error('Render email service initialization failed:', error);
+      console.error('Ultra-fast email service initialization failed:', error);
       this.isConfigured = false;
     }
   }
 
   async sendEmail(options) {
     if (!this.isConfigured || !this.transporter) {
-      throw new Error('Render email service not configured. Please check your email credentials.');
+      throw new Error('Ultra-fast email service not configured. Please check your email credentials.');
     }
 
     const { to, subject, text, html, from = this.config.user } = options;
 
     try {
-      console.log('Sending email via Render-optimized SMTP...');
+      console.log('Sending email via ultra-fast SMTP...');
       
       const mailOptions = {
         from: `"Lead Magnet Admin" <${from}>`,
@@ -79,15 +78,14 @@ class RenderEmailService {
         subject: subject,
         text: text,
         html: html,
-        // Add headers for better deliverability
         headers: {
           'X-Mailer': 'Lead Magnet Admin Panel',
           'X-Priority': '3'
         }
       };
 
-      // Use a very aggressive timeout for Render
-      const sendWithTimeout = (mailOptions, timeout = 10000) => {
+      // Ultra-aggressive timeout for Render
+      const sendWithTimeout = (mailOptions, timeout = 5000) => {
         return new Promise((resolve, reject) => {
           const timer = setTimeout(() => {
             reject(new Error('Email send timeout'));
@@ -105,18 +103,18 @@ class RenderEmailService {
       };
 
       const info = await sendWithTimeout(mailOptions);
-      console.log('Email sent successfully via Render SMTP:', info.messageId);
+      console.log('Email sent successfully via ultra-fast SMTP:', info.messageId);
       
       return {
         success: true,
         messageId: info.messageId,
-        response: 'Email sent via Render SMTP',
+        response: 'Email sent via ultra-fast SMTP',
         data: info
       };
 
     } catch (error) {
-      console.error('Render SMTP failed:', error);
-      throw new Error('Render SMTP failed: ' + error.message);
+      console.error('Ultra-fast SMTP failed:', error);
+      throw new Error('Ultra-fast SMTP failed: ' + error.message);
     }
   }
 
@@ -201,16 +199,16 @@ If you have any questions, please don't hesitate to contact us.
 
     try {
       await this.transporter.verify();
-      console.log('Render SMTP connection test successful');
+      console.log('Ultra-fast SMTP connection test successful');
       return true;
     } catch (error) {
-      console.error('Render SMTP connection test failed:', error.message);
+      console.error('Ultra-fast SMTP connection test failed:', error.message);
       return false;
     }
   }
 
   async reinitialize() {
-    console.log('Reinitializing Render email service...');
+    console.log('Reinitializing ultra-fast email service...');
     this.config = this.loadConfig();
     this.initialize();
     return this.isConfigured;
@@ -219,15 +217,15 @@ If you have any questions, please don't hesitate to contact us.
   getStatus() {
     return {
       configured: this.isConfigured,
-      service: 'render-smtp',
+      service: 'ultra-fast-smtp',
       fromEmail: this.config.user,
       fromName: this.config.fromName
     };
   }
 }
 
-const renderEmailService = new RenderEmailService();
+const ultraFastEmailService = new UltraFastEmailService();
 
 module.exports = {
-  renderEmailService
+  ultraFastEmailService
 };

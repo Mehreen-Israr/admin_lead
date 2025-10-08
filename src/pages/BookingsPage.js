@@ -290,6 +290,14 @@ const BookingsPage = () => {
         </div>
       </div>
 
+      {/* Calendly Upgrade Message */}
+      <div className="upgrade-notice">
+        <div className="notice-content">
+          <i className="fas fa-info-circle notice-icon"></i>
+          <span className="notice-text">New bookings will be displayed from backend after upgrading Calendly to standard</span>
+        </div>
+      </div>
+
       {/* Statistics Cards */}
       <div className="stats-grid">
         <div className="stat-card">
