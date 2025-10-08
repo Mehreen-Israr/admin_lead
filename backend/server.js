@@ -7,7 +7,11 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://admin-lead-frontend.onrender.com'],
+  origin: [
+    'http://localhost:3000', 
+    'https://admin-lead-frontend.onrender.com',
+    'https://admin.magnetleads.ai'  // ✅ Your new custom domain
+  ],
   credentials: true
 }));
 app.use(express.json());
