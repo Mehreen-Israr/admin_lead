@@ -50,7 +50,27 @@ export const AuthProvider = ({ children }) => {
   };
 
   const isAuthenticated = () => {
-    return !!(user && token && user.role === 'admin');
+    if (!user || !token || user.role !== 'admin') {
+      return false;
+    }
+    
+    // Check if token is expired
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const currentTime = Date.now() / 1000;
+      
+      if (payload.exp < currentTime) {
+        // Token is expired, clear storage
+        logout();
+        return false;
+      }
+      
+      return true;
+    } catch (error) {
+      // Invalid token format, clear storage
+      logout();
+      return false;
+    }
   };
 
   const value = {

@@ -34,9 +34,27 @@ const adminAuth = async (req, res, next) => {
     next();
   } catch (error) {
     console.error('Admin auth error:', error);
+    
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Token expired. Please log in again.',
+        code: 'TOKEN_EXPIRED'
+      });
+    }
+    
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid token. Please log in again.',
+        code: 'INVALID_TOKEN'
+      });
+    }
+    
     res.status(401).json({
       success: false,
-      message: 'Invalid token.'
+      message: 'Authentication failed.',
+      code: 'AUTH_ERROR'
     });
   }
 };

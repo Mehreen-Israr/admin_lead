@@ -23,6 +23,24 @@ const getAuthHeaders = () => {
   };
 };
 
+// Helper function to handle API responses and token expiration
+const handleApiResponse = async (response) => {
+  if (response.status === 401) {
+    // Token expired or invalid - clear storage and redirect to login
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminUser');
+    window.location.href = '/login';
+    throw new Error('Session expired. Please log in again.');
+  }
+  
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.message || 'API request failed');
+  }
+  
+  return response.json();
+};
+
 // API service functions
 export const fetchUsers = async () => {
   try {
@@ -30,11 +48,7 @@ export const fetchUsers = async () => {
       headers: getAuthHeaders()
     });
     
-    if (!response.ok) {
-      throw new Error('Failed to fetch users');
-    }
-    
-    const result = await response.json();
+    const result = await handleApiResponse(response);
     return result.data || [];
   } catch (error) {
     console.error('Error fetching users:', error);
@@ -48,11 +62,7 @@ export const fetchContacts = async () => {
       headers: getAuthHeaders()
     });
     
-    if (!response.ok) {
-      throw new Error('Failed to fetch contacts');
-    }
-    
-    const result = await response.json();
+    const result = await handleApiResponse(response);
     return result.data || [];
   } catch (error) {
     console.error('Error fetching contacts:', error);
@@ -90,11 +100,7 @@ export const getDashboardStats = async () => {
       headers: getAuthHeaders()
     });
     
-    if (!response.ok) {
-      throw new Error('Failed to fetch dashboard stats');
-    }
-    
-    return await response.json();
+    return await handleApiResponse(response);
   } catch (error) {
     console.error('Error fetching dashboard stats:', error);
     throw error;
